@@ -1,0 +1,802 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="机器学习,CRF,概率图模型,概率论,维特比," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="到条件随机场（CRF），就不得不提最大熵（ME），可以说这两是最常见的概率无向图模型，并且同时都在NLP很多问题中大显身手，比如，在NLP中最基础的词性标注任务中，就经常使用ME和CRF。由于ME和CRF建模思想不同，也就导致ME和CRF是从不同角度来解决词性标注问题的，ME是将这一问题看作是分类问题的（即，输入当前词的特征，然后由ME模型给出一个类别标签），而CRF则是将其视为序列标注问题（CR">
+<meta name="keywords" content="机器学习,CRF,概率图模型,概率论,维特比">
+<meta property="og:type" content="article">
+<meta property="og:title" content="学习笔记：条件随机场（CRF）">
+<meta property="og:url" content="http://yoursite.com/2017/06/10/CRF/index.html">
+<meta property="og:site_name" content="Glacier&#39;s Blog">
+<meta property="og:description" content="到条件随机场（CRF），就不得不提最大熵（ME），可以说这两是最常见的概率无向图模型，并且同时都在NLP很多问题中大显身手，比如，在NLP中最基础的词性标注任务中，就经常使用ME和CRF。由于ME和CRF建模思想不同，也就导致ME和CRF是从不同角度来解决词性标注问题的，ME是将这一问题看作是分类问题的（即，输入当前词的特征，然后由ME模型给出一个类别标签），而CRF则是将其视为序列标注问题（CR">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2017/05/crf1.jpg">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2017/05/crf2.jpg">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2017/05/crf3.png">
+<meta property="og:updated_time" content="2017-06-10T12:17:01.051Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="学习笔记：条件随机场（CRF）">
+<meta name="twitter:description" content="到条件随机场（CRF），就不得不提最大熵（ME），可以说这两是最常见的概率无向图模型，并且同时都在NLP很多问题中大显身手，比如，在NLP中最基础的词性标注任务中，就经常使用ME和CRF。由于ME和CRF建模思想不同，也就导致ME和CRF是从不同角度来解决词性标注问题的，ME是将这一问题看作是分类问题的（即，输入当前词的特征，然后由ME模型给出一个类别标签），而CRF则是将其视为序列标注问题（CR">
+<meta name="twitter:image" content="http://glacier.iego.net/wp-content/uploads/2017/05/crf1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/10/CRF/"/>
+
+
+
+
+
+  <title>学习笔记：条件随机场（CRF） | Glacier's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Glacier's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/10/CRF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Glacier">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Glacier's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">学习笔记：条件随机场（CRF）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-10T19:08:48+08:00">
+                2017-06-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/06/10/CRF/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/06/10/CRF/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>到条件随机场（CRF），就不得不提最大熵（ME），可以说这两是最常见的概率无向图模型，并且同时都在NLP很多问题中大显身手，比如，在NLP中最基础的词性标注任务中，就经常使用ME和CRF。由于ME和CRF建模思想不同，也就导致ME和CRF是从不同角度来解决词性标注问题的，ME是将这一问题看作是分类问题的（即，输入当前词的特征，然后由ME模型给出一个类别标签），而CRF则是将其视为序列标注问题（CRF会对整个输出序列进行建模）。<a id="more"></a>就这一问题而言，CRF效果一般会好于ME，但相应的计算量也会大一些。其实在后续内容中，我们还会看到CRF模型的表示和ME的表示在形式上非常相似，但是需要注意的是由于两者建模思想完全不同，所以实质是有很多区别，后续内容会详细介绍。更具体的，ME和CRF的关系可以从下图中看出，<br><img class="alignnone size-full wp-image-603" src="http://glacier.iego.net/wp-content/uploads/2017/05/crf1.jpg" alt="" width="694" height="156"></p>
+<p>想了解最大熵模型（ME）可以参考我的另一篇博客<a href="http://glacier.iego.net/%E6%9C%80%E5%A4%A7%E7%86%B5%E6%A8%A1%E5%9E%8B%E5%8F%8A%E5%BA%94%E7%94%A8%E7%AE%80%E4%BB%8B/" target="_blank" rel="external">《最大熵模型及应用简介》</a></p>
+<p>本文主要参考了李航的《统计学习方法》、周志华的《机器学习》和Daphne Koller的《Probabilistic Graphical Models》这三本书。<br>首先，我们先简单了解一下什么是概率图模型以及什么是概率无向图模型：</p>
+<p><ul><br>     <li>概率图模型（来自Wikipedia）：在概率论、统计学及机器学习中，<strong>概率图模型</strong>是用图论方法以表现数个独立随机变量之关系的一种建模法。其图中的任一节点为随机变量，若两节点间无边相接则意味此二变量彼此条件独立。<br>两种常见的概率图模型是<strong>具有向性边</strong>的图及<strong>具无向性边</strong>的图。 若为具有向性边的图，该图显示了所有随机变量的合成概率函数的因子分区。根据图的有向性，概率图模型可以分成两大类，分别是<strong>贝叶斯网络</strong>和<strong>马尔科夫网络</strong>。这两类网络均具有因子化和条件独立的性质，但条件独立的类型和将分布因子化的方式有所不同。</li><br>     <li>概率无向图模型（来自《统计学习方法》）：设有联合概率分布$P(Y)$，由无向图$G=(V,E)$表示，在图$G$中，结点表示随机变量，边表示随机变量之间的依赖关系。如果联合概率分布$P(Y)$满足成对、局部或全局马尔科夫性，就称此联合概率分布为<strong>概率无向图模型</strong>，或<strong>马尔科夫随机场（MRF）</strong>。</li><br></ul><br>有了上面的概念后，我们来看看什么是条件随机场（CRF）：如果给定的MRF中每个随机变量下面还有观察值，我们要确定的是给定观察集合下MRF的分布，也就是条件分布，那么这个MRF就称为<strong>CRF(Conditional Random Field)</strong>。它的条件分布形式完全类似于MRF的分布形式，只不过多了一个观察集合$X=(x_1,x_2,…,x_n)$。<br>接下来的问题，就是如何参数化这个条件概率分布。根据上述定义，给定观察集合$X$后，输出集合$Y$实质是一个MRF，所以参数化这个条件概率的方法和MRF模型的参数化方法是一样的。然而，由于图中的交互影响是无向的，所以无法使用在给定其他节点时在一个节点上表示分布的标准CPD（注：这是贝叶斯网络的参数化方法），相反，我们需要更加对称的参数化方法。同时，也正是由于这种对称性存在，使得MRF模型的参数化更加困难，也更加难于理解（不像贝叶斯网络那样直观）。<br>在进一步介绍MRF参数化形式之前，先介绍一种分布——吉布斯分布（Gibbs Distribution）<br><img src="http://glacier.iego.net/wp-content/uploads/2017/05/crf2.jpg" alt="" width="604" height="203" class="alignnone size-full wp-image-609"><br>然后再介绍一个定理：Hammersley-Clifford 定理<br>Hammersley-Clifford 定理指出：马尔科夫随机场和Gibbs分布是一致的，即概率无向图模型的联合概率分布P(Y)可以表示为如下形式：<br>$$P(Y)=\frac{1}{Z}\prod_c\Psi_c (Y_c)$$<br>$$Z=\sum_Y\prod_c\Psi_c (Y_c)$$<br>其中，$C$是无向图的最大团，$Y_c$是$C$的结点对应的随机变量，$\Psi_c(Y_c)$（势函数）是$C$上定义的严格正函数，乘积是在无向图所有的最大团上进行的。<br>周志华的《机器学习》一书中给出了Hammersley-Clifford 定理必要性证明（即Gibbs分布是马尔科夫随机场），感兴趣的可以推导一下充分性。<br>既然MRF可以拆分成多个因子的乘积的形式，那么同样的CRF中的条件概率分布$P(Y|X)$也可以由多个因子相乘来表示。更具体的，我们这里只研究线性链CRF，因为目前序列标注问题主要用的就是线性链CRF。什么是线性链CRF以及线性链CRF和其他模型的关系可以见下图，<br><img src="http://glacier.iego.net/wp-content/uploads/2017/05/crf3.png" alt="" width="600" height="300" class="alignnone size-full wp-image-613"><br>根据上述MRF参数化的方法，我们只需要在最大团上定义势函数$\Psi_c(Y_c)$即可。同时由于线性链CRF是线性的，随意最大团实际上就是相邻两个节点，因此，线性链CRF可以表示成如下形式，<br>$$P(y│x)=\frac{1}{Z(x)} exp(\sum_{i,k}\lambda_kt_k(y_{i-1},y_i,x,i)+\sum_{i,l}\mu_ls_l(y_i,x,i))$$<br>其中，$Z(x)=\sum_y exp(\sum_{i,k}\lambda_kt_k(y_{i-1},y_i,x,i)+\sum_{i,l}\mu_ls_l(y_i,x,i))$<br>式子中，$t_k$和$s_l$是特征函数（$t_k$是转移特征，$s_l$是状态特征），$λ_k$和$μ_l$是对应的权值。$Z(x)$是规范化因子，求和是在所有可能的输出序列上进行的。需要额外说明一下，这只是线性链CRF的一种形式，相当于我们用$e^{f(x)}$来作为势函数，而$f(x)$用的是特征函数（特征函数同最大熵的特征函数一样，$\in{0,1}$）的线性求和的形式，所以这算是比较simple的模型。事实上，很多CRF的升级版，比如将深度神经网络学到的特征表示替代上述式子中的特征函数（e.g，<a href="http://aclweb.org/anthology/P/P16/P16-1101.pdf" target="_blank">Ma et al., 2016</a>），由于引入了神经网络，所以这里的$f(x)$不再是线性的了。因而，势函数的形式可以是多样的，但后续讨论中我们只对这种简单的定义形式进行研究。<br>上述CRF表示形式只是为了方便理解，我们将特征函数拆分成了两部分——转移特征$t_k$和状态特征$s_l$，接下来我们对这一表示形式进行简化。<br>为了方便起见，首先将转移特征和状态特征及其权重用统一的符号表示，设有$K_1$个转移特征，$K_2$个状态特征，$K=K_1+K_2$，记<br>$$<br>f_k(y_(i-1),y_i,x,i)=<br>\begin{cases}<br>t_k(y_{i-1},y_i,x,i)&amp;&amp;k=1,2,3,…,K_1\\<br>s_l(y_i,x,i)&amp;&amp;k=K_1+l;l=1,2,3,…,K_2<br>\end{cases}<br>$$<br>然后，对转移与状态特征在各个位置i求和，记作<br>$$f_k(y,x)=\sum_(i=1)^nf_k(y_(i-1),y_i,x,i)\quad k=1,2,3,…,K$$<br>用$w_k$表示特征$f_k(y,x)$的权重，即<br>$$w_k=<br>\begin{cases}<br>\lambda_k&amp;&amp;k=1,2,3,…,K_1\\<br>\mu_l&amp;&amp;k=K_1+l;l=1,2,3,…,K_2<br>\end{cases}<br>$$<br>于是，条件随机场的计算公式可以表示为<br>$$\begin{align}&amp;&amp;P(y│x)=\frac{1}{Z(x)}exp⁡(\sum_{k=1}^Kw_kf_k(y,x))\\<br>&amp;&amp;Z(x)=\sum_yexp⁡(\sum_{k=1}^Kw_kf_k(y,x))\end{align}$$<br>公式推导这一步，我们会发现一个很神奇的事情，将CRF的表示形式进行简化后，条件概率分布$P(y|x)$和最大熵中的条件概率分布在表示形式上非常相似，几乎就是同一个公式，只是特征函数的不一样以及$Z(x)$的计算不一样。看到这里，或许我们会认为最大熵和CRF很相似，其实是不然的。也许我们会像如果将最大熵模型中的特征函数定义成和CRF的特征函数一致，是不是可以认为最大熵就变成CRF了？事实并不是这样的，以序列标注任务为例，即使最大熵模型的特征函数可以定义成和CRF一样，考虑上一个标注结果$y_{i-1}$，但事实上模型在输出时依旧只关注当前的$y_i$，也就是说CRF通过维特比解码得到一个全局最优解，而最大熵模型仅仅只是使得每个$y_i$最优。所以，CRF和最大熵有着本质的区别，CRF是对整个序列进行建模的而最大熵只是对每个单独的标注样例进行建模的（从$Z(x)$的计算也可以看成，CRF模型中$Z(x)$是对整个序列所有输出情况进行求和，而最大熵仅仅只是对有多少中标注类别进行求和），因而在序列标注任务上CRF会优于最大熵模型，但计算开销也会更大一些。</p>
+<p></p><h3>学习算法（参数估计）</h3><br>下面，我们来介绍一下CRF模型的学习算法。<br>这里我们只讨论拟牛顿法（BFGS算法）。<br>对于条件随机场模型，<br>$$P_w (y│x)=\frac{1}{(\sum_yexp⁡(\sum_{k=1}^Kw_kf_k(y,x)))}exp⁡(\sum_{k=1}^Kw_kf_k(y,x))$$<br>需要学习的优化目标函数是<br>$$<br>\begin{align}<br> min_{w\in R^n}f⁡(w) &amp;= -L(w)=-\sum_{x,y}\tilde{P}(x,y)logP_w(y|x)) \\<br> &amp;=\sum_x\tilde{P}(x)log\sum_yexp⁡(\sum_{k=1}^Kw_kf_k(y,x)-∑_{x,y}\tilde{P}(x,y)\sum_{k=1}^Kw_kf_k (y,x)<br>\end{align}<br>$$<br>其梯度函数是<br>$$g(w)=\sum_{x,y}\tilde{P}(x)P_w(y│x)f(x,y)-E_\tilde{P}(f)$$<br><br><br>条件随机场模型学习的BFGS算法。<br>输入：特征函数$f_1,f_2,…,f_n$，经验分布$\tilde{P}(X,Y)$<br>输出：最优参数值$\hat{w}$；最优模型$P_\hat{w}(y|x)$<br>(1) 选定初始点$w^{(0)}$，取$B_0$为正定对称矩阵，置$k=0$<br>(2) 计算$g_k=g(x^{(k)})$。若$g_k=0$，则停止计算；否则转（3）<br>(3) 由$B_kp_k=-g_k$求出$p_k$<br>(4) 一维搜索：求$\lambda_k$使得<br>$$f(x^{(k)}+\lambda_kp_k)=lim_{λ≥0}⁡f(x^{(k)}+\lambda p_k)$$<br>(5) 置$w^{(k+1)}=w^{(k)}+\lambda_kp_k$<br>(6) 计算$g_{k+1}=g(x^{(k+1)})$，若$g_{k+1}=0$，则停止计算；否则，按如下公式计算$B_{k+1}$，<br>$$B_{k+1}=B_k+\frac{y_ky_k^T}{y_k^T\delta_k}-\frac{B_k\delta_k\delta_k^TB_k}{\delta_k^TB_k\delta_k}$$<br>其中，$$y_k=g_{k+1}-g_k，\delta_k=w^{(k+1)}-w^{(k)}$$<br>(7) 置$k=k+1$，转（3）<br><br><p></p>
+<p></p><h3>条件随机场的预测算法（维特比算法）</h3><br>维特比算法是一个典型的动态规划算法，算法主要就是用于寻找最优路径，比较常用于隐马尔可夫模型的解码中。其实维特比算法的思想和dijkstra算法在思想上是差不多的，都是利用之前节点的最优值来更新当前节点，只不过维特比算法所针对的图比较特殊一些（图是有向的，时间戳$t_i$下的所有节点和$t_{i-1}$的节点是全连接的，寻找从$t_0$到$t_n$最优路径），这就使得维特比算法实现起来比较dijkstra算法要简单一些（不需要用到最小堆）。<br>$$F_i(y_{i-1},y_i,x)=(f_1(y_{i-1},y_i,x,i),f_2(y_{i-1},y_i,x,i),…,f_K(y_{i-1},y_i,x,i))^T$$<br>输入：模型特征向量$F(y,x)$和权重向量$w$，观察序列$x=(x_1,x_2,…,x_n)$<br>输出：最优路径$y^*=(y_1^*,y_2^*,…,y_n^*)$<br>(1) 初始化<br>$$\delta_1(j)=w\cdot F_1(y_0=start,y_1=j,x),\quad j=1,2,3,…,m$$<br>(2) 递推，对$i=1,2,…,n$<br>$$<br>\begin{align}<br> \delta_i(l) &amp;= max_{1≤j≤m}\{\delta_{i-1}(j)+w\cdot F_i(y_{i-1}=j,y_i=l,x)\},\quad l=1,2,..,m\\<br> \Psi_i(l) &amp;= arg max_{1≤j≤m}\{\delta_{i-1}(j)+w\cdot F_i (y_{i-1}=j,y_i=l,x)\},\quad l=1,2,..,m<br>\end{align}<br>$$<br>(3) 终止<br>$$<br>\begin{align}<br> max_y⁡(w\cdot F(y,x)) &amp;=max_{1≤j≤m}\delta_n(j)\\<br> y_n^* &amp;= arg⁡ max_{1≤j≤m}⁡\delta_n(j)<br>\end{align}<br>$$<br>(4) 返回路径<br>$$y_i^*=\Psi_{i+1}(y_{i+1}^* ),\quad i=n-1,n-2,…,1$$<br><br><br>PS：想对CRF有更深入研究的可以参考一下这份资料<a href="http://homepages.inf.ed.ac.uk/csutton/publications/crftut-fnt.pdf" target="_blank">《An Introduction to Conditional Random Fields》</a><p></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+            <a href="/tags/CRF/" rel="tag"># CRF</a>
+          
+            <a href="/tags/概率图模型/" rel="tag"># 概率图模型</a>
+          
+            <a href="/tags/概率论/" rel="tag"># 概率论</a>
+          
+            <a href="/tags/维特比/" rel="tag"># 维特比</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/10/CNN-in-NLP/" rel="prev" title="卷积神经网络（CNN）在NLP中的应用">
+                卷积神经网络（CNN）在NLP中的应用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="Glacier" />
+          <p class="site-author-name" itemprop="name">Glacier</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">学习算法（参数估计）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">条件随机场的预测算法（维特比算法）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Glacier</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://hit-computer-github-io.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/06/10/CRF/';
+          this.page.identifier = '2017/06/10/CRF/';
+          this.page.title = '学习笔记：条件随机场（CRF）';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://hit-computer-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

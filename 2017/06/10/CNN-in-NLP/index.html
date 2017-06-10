@@ -1,0 +1,775 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="机器学习,深度学习,NLP,CNN," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="纵观机器学习或者深度学习算法，都没有某一个算法只适用于某一个领域，大多数在某个领域取得显著成果的算法，稍加修改后在别的领域依旧能够取得非常不错的结果。我们知道卷积神经网络（CNN）广泛用于计算机视觉中，大约从2014年开始ImageNet参赛队伍提交的模型基本都是基于CNN的。在卷积神经网络在图像领域取得巨大成果后，有研究人员开始在自然语言处理领域开始使用卷积神经网络，早期的研究是在句子分类任务上">
+<meta name="keywords" content="机器学习,深度学习,NLP,CNN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="卷积神经网络（CNN）在NLP中的应用">
+<meta property="og:url" content="http://yoursite.com/2017/06/10/CNN-in-NLP/index.html">
+<meta property="og:site_name" content="Glacier&#39;s Blog">
+<meta property="og:description" content="纵观机器学习或者深度学习算法，都没有某一个算法只适用于某一个领域，大多数在某个领域取得显著成果的算法，稍加修改后在别的领域依旧能够取得非常不错的结果。我们知道卷积神经网络（CNN）广泛用于计算机视觉中，大约从2014年开始ImageNet参赛队伍提交的模型基本都是基于CNN的。在卷积神经网络在图像领域取得巨大成果后，有研究人员开始在自然语言处理领域开始使用卷积神经网络，早期的研究是在句子分类任务上">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2016/05/CNN_NLP1.png">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2016/05/CNN_NLP2.png">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2016/05/CNN_NLP3.png">
+<meta property="og:updated_time" content="2017-06-10T12:15:47.921Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="卷积神经网络（CNN）在NLP中的应用">
+<meta name="twitter:description" content="纵观机器学习或者深度学习算法，都没有某一个算法只适用于某一个领域，大多数在某个领域取得显著成果的算法，稍加修改后在别的领域依旧能够取得非常不错的结果。我们知道卷积神经网络（CNN）广泛用于计算机视觉中，大约从2014年开始ImageNet参赛队伍提交的模型基本都是基于CNN的。在卷积神经网络在图像领域取得巨大成果后，有研究人员开始在自然语言处理领域开始使用卷积神经网络，早期的研究是在句子分类任务上">
+<meta name="twitter:image" content="http://glacier.iego.net/wp-content/uploads/2016/05/CNN_NLP1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/10/CNN-in-NLP/"/>
+
+
+
+
+
+  <title>卷积神经网络（CNN）在NLP中的应用 | Glacier's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Glacier's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/10/CNN-in-NLP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Glacier">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Glacier's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">卷积神经网络（CNN）在NLP中的应用</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-10T20:08:42+08:00">
+                2017-06-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/深度学习/" itemprop="url" rel="index">
+                    <span itemprop="name">深度学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/06/10/CNN-in-NLP/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/06/10/CNN-in-NLP/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>纵观机器学习或者深度学习算法，都没有某一个算法只适用于某一个领域，大多数在某个领域取得显著成果的算法，稍加修改后在别的领域依旧能够取得非常不错的结果。我们知道卷积神经网络（CNN）广泛用于计算机视觉中，大约从2014年开始ImageNet参赛队伍提交的模型基本都是基于CNN的。在卷积神经网络在图像领域取得巨大成果后，有研究人员开始在自然语言处理领域开始使用卷积神经网络，早期的研究是在句子分类任务上做的，基于CNN的模型取得了非常显著的效果，这也表明了CNN同样适用于NLP领域的一些问题<a id="more"></a>【PS，附上一个彩蛋，这里有一个用Theano实现的CNN模型<a href="https://github.com/hit-computer/GRU-or-CNN" target="_blank" rel="external">GRU-or-CNN</a>（觉得不错记得加星哟），可以对两个有关系的句子进行建模】。同样的，我们知道NLP中最常见的深度学习模型是循环神经网络（RNN），这是一个对序列进行建模的模型，因而这一模型在语音处理领域也有广泛的应用，其实也有人尝试过在图像处理领域使用RNN模型，比如这篇论文<a href="http://arxiv.org/pdf/1505.00393v1.pdf" target="_blank">《ReNet: A Recurrent Neural Network Based Alternative to Convolutional Networks》</a>。由此可见，CNN、RNN这些深度学习算法并没有领域之分，同样传统的机器学习算法也一样，比如最常见的分类模型SVM，只要是分类任务基本都可以用SVM，无论是在图像还是自然语言领域。</p>
+<p>下面我们就来看一些卷积神经网络在NLP中的应用以及所取得的显著效果：</p>
+<p><ul><br>    <li><a href="http://arxiv.org/abs/1404.2188" target="_blank">《A Convolutional Neural Network for Modelling Sentences》</a>，这篇论文应该算是比较早期在NLP任务中运用卷积神经网络的了，这是ACL2014年的一篇论文。论文中提到CNN模型的一个优势就是不依赖于parse树，并且很容易适用于任何语言。这篇论文的一个创新点在于动态pooling技术，即在做max pooling的时候不是只取最大值，而是取k-max的值。这里插入一句，关于CNN中max pooling的一些介绍，请参考这篇博客<a href="http://blog.csdn.net/malefactor/article/details/51078135#0-tsina-1-38411-397232819ff9a47a7b7e80a40613cfe1" target="_blank">《自然语言处理中CNN模型几种常见的Max Pooling操作》</a>，这篇博客对常见几种max pooling方法都有很详细的介绍。对于这篇论文，还有一点需要注意的，就是论文中的模型是针对词向量的每一维进行卷积的，而后续的其他模型一般都是对整个词向量进行卷积的（即卷积窗口的长度为词向量维度），这一点也可以从如下模型示意图中看出，<br><img class="alignnone size-full wp-image-404" style="width: 430px;" src="http://glacier.iego.net/wp-content/uploads/2016/05/CNN_NLP1.png" alt="CNN_NLP1"></li><br>    <li><a href="http://arxiv.org/abs/1408.5882" target="_blank">《Convolutional Neural Networks for Sentence Classification》</a>，这是EMNLP2014的一篇论文。论文中基于CNN的模型和上一篇论文中的CNN不太一样，第一个是并没有采用动态pooling的技术，第二卷积窗口的长度为词向量的维度，这两点都可以从模型示意图中看出来，<br><img class="alignnone size-full wp-image-410" style="width: 700px;" src="http://glacier.iego.net/wp-content/uploads/2016/05/CNN_NLP2.png" alt="CNN_NLP2"><br>具体的操作为，假如卷积窗口宽度为m，那么取m个连续的词，将他们对应的词向量连接在一起得到一个[latex]m*d[/latex]维的向量[latex]\mathbf{x}_{i:i+m-1}[/latex]（[latex]d[/latex]表示词向量维度）。然后向量[latex]\mathbf{x}_{i:i+m-1}[/latex]与卷积核w相乘（w也是一个向量），[latex]c_i=f(\mathbf{w}{\cdot}\mathbf{x}_{i:i+m-1}+b)[/latex]，窗口滑动得到[latex]\mathbf{c}=[c_1,c_2,…,c_{n-m+1}][/latex]，再对[latex]\mathbf{c}[/latex]做max pooling得到一个值，假设现在又K个卷积核，那么最后得到K维的向量。很显然，这里做pooling操作的目前就是处理不同长度的句子，使得无论句子长度为多少，卷积核宽度是多少，最终到得到定长的向量表示，同时max pooling也是capture最重要的特征信息。作者在7个数据集上与14个模型进行了比较，这7个数据集全是句子分类任务（包括电影reviews，question分类，以及MP3的reviews）。通过大量的实验证明了CNN模型适用于多种任务，而且效果非常显著，相比于传统方法不用进行繁琐的特征工程而且也不需要parse树。这篇论文还给出了一个非常好的结论，模型输入预先训练好的词向量比随机初始化词向量效果要好很多，目前大家使用deep learning都会输入预先训练好的词向量。</li><br>    <li><a href="http://www.aclweb.org/anthology/D/D15/D15-1167.pdf" target="_blank">《Document Modeling with Gated Recurrent Neural Network for Sentiment Classification》</a>，这是EMNLP2015的一篇论文，论文主要是对文本进行建模，然后分析文本的情感极性。作者采用了两层神经网络来学习文本的表示，即先用CNN来学习句子的表示，在用一个双向的RNN来学习文本的表示，最后一个softmax层得到情感极性，模型结构如下图，<br><img class="alignnone size-full wp-image-414" style="width: 700px;" src="http://glacier.iego.net/wp-content/uploads/2016/05/CNN_NLP3.png" alt="CNN_NLP3"><br>模型中从词到句子表示的CNN模型采用的第二篇论文中的CNN模型，而且作者分别设置窗口宽度为1、2、3，这正好类似于uni-grams，bi-grams，和tri-grams。</li><br>    <li><a href="http://arxiv.org/abs/1506.06490" target="_blank">《Answer Sequence Learning with Neural Networks for Answer Selection in Community Question Answering》</a>，这篇论文同样同时使用了CNN和RNN，不过是对不同的内容进行建模的。论文所正对的任务是answer selection，对于一个question，有很多answers作为候选，模型需要选出匹配question的answer，同时该论文所针对的answers还有一个特定是这些answers之间存在对话关系（即关于该question的一个讨论，比如一些论坛，同一个问题下有很多回答，而这些回答存在一个回复对话关系）。作者将这一任务看出是一个序列标注任务，即对所有answers打标签。具体算法步骤为，先用CNN学习question和一个answer之间的联合表示，然后将这个表示作为RNN的输入，学习answers之间的序列关系，RNN输出每个answers的标签（good，bad，和potential）。</li><br></ul><br>说了这么多，大家对CNN模型也有了一个大致的认识，下面通过一些代码来更加直观的理解CNN，代码用theano实现。（代码来自<a href="https://github.com/hit-computer/GRU-or-CNN/blob/master/CNNModel.py" target="_blank" rel="external">CNNModel.py</a>，略有改动）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">DocmentEncoder</span><span class="params">()</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">init_params</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="string">""" sent weights """</span></div><div class="line">        self.Filter1 = add_to_params(self.params, theano.shared(value=NormalInit(self.rng, self.rankdim, self.qdim_encoder), name=<span class="string">'Filter1'</span>))</div><div class="line">        self.Filter2 = add_to_params(self.params, theano.shared(value=NormalInit(self.rng, <span class="number">2</span>*self.rankdim, self.qdim_encoder), name=<span class="string">'Filter2'</span>))</div><div class="line">        self.Filter3 = add_to_params(self.params, theano.shared(value=NormalInit(self.rng, <span class="number">3</span>*self.rankdim, self.qdim_encoder), name=<span class="string">'Filter3'</span>))</div><div class="line">        </div><div class="line">        self.b_1 = add_to_params(self.params, theano.shared(value=np.zeros((self.qdim_encoder,), dtype=<span class="string">'float32'</span>), name=<span class="string">'cnn_b1'</span>))</div><div class="line">        self.b_2 = add_to_params(self.params, theano.shared(value=np.zeros((self.qdim_encoder,), dtype=<span class="string">'float32'</span>), name=<span class="string">'cnn_b2'</span>))</div><div class="line">        self.b_3 = add_to_params(self.params, theano.shared(value=np.zeros((self.qdim_encoder,), dtype=<span class="string">'float32'</span>), name=<span class="string">'cnn_b3'</span>))</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">ConvLayer1</span><span class="params">(self, q1)</span>:</span></div><div class="line">        output = T.dot(q1, self.Filter1) + self.b_1</div><div class="line">        <span class="keyword">return</span> output</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">ConvLayer2</span><span class="params">(self, q1, q2)</span>:</span></div><div class="line">        output = T.dot(T.concatenate([q1, q2], axis=<span class="number">1</span>), self.Filter2) + self.b_2</div><div class="line">        <span class="keyword">return</span> output</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">ConvLayer3</span><span class="params">(self, q1, q2, q3)</span>:</span></div><div class="line">        output = T.dot(T.concatenate([q1, q2, q3], axis=<span class="number">1</span>), self.Filter3) + self.b_3</div><div class="line">        <span class="keyword">return</span> output</div><div class="line">    </div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">Convolution</span><span class="params">(self, xe)</span>:</span></div><div class="line">        _res1, _ = theano.scan(self.ConvLayer1, sequences=[xe])</div><div class="line">        _res2, _ = theano.scan(self.ConvLayer2, sequences=[xe[:<span class="number">-1</span>], xe[<span class="number">1</span>:]])</div><div class="line">        _res3, _ = theano.scan(self.ConvLayer3, sequences=[xe[:<span class="number">-2</span>],xe[<span class="number">1</span>:<span class="number">-1</span>],xe[<span class="number">2</span>:]])</div><div class="line">        </div><div class="line">        hidden1 = T.tanh(T.max(_res1,axis=<span class="number">0</span>))</div><div class="line">        hidden2 = T.tanh(T.max(_res2,axis=<span class="number">0</span>))</div><div class="line">        hidden3 = T.tanh(T.max(_res3,axis=<span class="number">0</span>))</div><div class="line">        </div><div class="line">        <span class="keyword">return</span> T.mean(T.concatenate([hidden1, hidden2, hidden3], axis=<span class="number">0</span>), axis=<span class="number">0</span>)</div><div class="line">        <span class="comment">#return (hidden1 + hidden2 + hidden3)/3.0</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        self.rankdim = dim</div><div class="line">        self.qdim_encoder = qdim_encoder</div><div class="line">        self.name = <span class="string">'CNN'</span></div><div class="line">        self.params = []</div><div class="line">        self.rng = np.random.RandomState(<span class="number">23455</span>)</div><div class="line">        self.init_params()</div></pre></td></tr></table></figure>
+<p>简单解读一下这段代码，24行的Convolution函数是这个类的核心函数，输入的xe变量需要是一个三维tensor，每一个元素都是一个单行矩阵，而且需要包含至少3个元素。ConvLayer1，ConvLayer2，和ConvLayer3本别对应窗口宽度为1,2,3的卷积操作。这里需要重点提一下33行的代码，<code>T.mean(T.concatenate([hidden1, hidden2, hidden3], axis=0), axis=0)</code>，其实这个操作就对hidden1，hidden2，hidden3求平均，按理说直接采用被注释掉的34行的写法是最简单的，但是如果采用34行的写法，在求梯度时会报错（错误信息大意是在构建图的时候会引入环，“This substitution would insert a cycle in the graph”）。所以不得已采用了33行这种复杂的写法，具体为什么会出现这个原因我至今还没有弄清楚，但这至少告诉了我们一点，就是尽可能用theano的函数来实现一些计算，因为这些函数的具体求导形式或构建网络图theano肯定是定义好了的，所以不容易出错。顺带我们再分析一下输出的维度吧，首先xe是一个3维tensor，所以每次传给ConvLayer的是一个矩阵，同时ConvLayer返回的也是一个矩阵，因此_res1将是一个3维tensor，然后T.max操作会降一维，得到的hidden1是一个矩阵，最后的T.mean再降一维，所以返回的将是一个向量（只有一维）。</p>
+<p>以上内容全是我个人观点和总结，如有错误欢迎指正和讨论。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+            <a href="/tags/深度学习/" rel="tag"># 深度学习</a>
+          
+            <a href="/tags/NLP/" rel="tag"># NLP</a>
+          
+            <a href="/tags/CNN/" rel="tag"># CNN</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/10/CRF/" rel="next" title="学习笔记：条件随机场（CRF）">
+                <i class="fa fa-chevron-left"></i> 学习笔记：条件随机场（CRF）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="Glacier" />
+          <p class="site-author-name" itemprop="name">Glacier</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Glacier</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://hit-computer-github-io.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/06/10/CNN-in-NLP/';
+          this.page.identifier = '2017/06/10/CNN-in-NLP/';
+          this.page.title = '卷积神经网络（CNN）在NLP中的应用';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://hit-computer-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
