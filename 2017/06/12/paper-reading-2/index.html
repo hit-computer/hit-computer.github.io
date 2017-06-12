@@ -1,0 +1,807 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="机器学习,深度学习,NLP,文本生成,向量化," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="承接上一篇博客《研一一年论文总结（上）》，依旧和上一篇博客一样按照NLP任务来分类总结研一一年看过的全部论文。其实这部分基本可以看作是文本生成的专题了，由于本人一直在做高考作文生成方面的研究，所以看了很多文本生成相关的论文。">
+<meta name="keywords" content="机器学习,深度学习,NLP,文本生成,向量化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="研一一年论文总结（下）">
+<meta property="og:url" content="http://yoursite.com/2017/06/12/paper-reading-2/index.html">
+<meta property="og:site_name" content="Glacier&#39;s Blog">
+<meta property="og:description" content="承接上一篇博客《研一一年论文总结（上）》，依旧和上一篇博客一样按照NLP任务来分类总结研一一年看过的全部论文。其实这部分基本可以看作是文本生成的专题了，由于本人一直在做高考作文生成方面的研究，所以看了很多文本生成相关的论文。">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2016/11/summarize_1.jpg">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2016/11/summarize_2.jpg">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2016/11/summarize_3.jpg">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2016/11/summarize_4.jpg">
+<meta property="og:updated_time" content="2017-06-12T06:26:01.190Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="研一一年论文总结（下）">
+<meta name="twitter:description" content="承接上一篇博客《研一一年论文总结（上）》，依旧和上一篇博客一样按照NLP任务来分类总结研一一年看过的全部论文。其实这部分基本可以看作是文本生成的专题了，由于本人一直在做高考作文生成方面的研究，所以看了很多文本生成相关的论文。">
+<meta name="twitter:image" content="http://glacier.iego.net/wp-content/uploads/2016/11/summarize_1.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/12/paper-reading-2/"/>
+
+
+
+
+
+  <title>研一一年论文总结（下） | Glacier's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=62554609";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Glacier's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/12/paper-reading-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Glacier">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Glacier's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">研一一年论文总结（下）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-12T14:01:05+08:00">
+                2017-06-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/论文阅读/" itemprop="url" rel="index">
+                    <span itemprop="name">论文阅读</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/06/12/paper-reading-2/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/06/12/paper-reading-2/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>承接上一篇博客<a href="https://hit-computer.github.io/2017/06/12/paper-reading-1/" target="_blank">《研一一年论文总结（上）》</a>，依旧和上一篇博客一样按照NLP任务来分类总结研一一年看过的全部论文。其实这部分基本可以看作是<strong>文本生成</strong>的专题了，由于本人一直在做高考作文生成方面的研究，所以看了很多文本生成相关的论文。<a id="more"></a></p>
+<ul><br><li><br><h3>文本生成（Text Generation）</h3><br>这部分总共看了11篇论文，大部分是对话生成。其实这里不少论文在我的另一篇博客中有更详细的介绍<a href="https://hit-computer.github.io/2017/06/10/CNN-in-NLP/" target="_blank">《DEEP LEARNING在NLP中的应用——ENCODER-DECODER结构学习笔记》</a>。<br><br>既然提到文本生成任务，那这里再推荐一个用char-rnn做文本生成的模型（github传送门：<a href="https://github.com/hit-computer/char-rnn-tf" target="_blank" rel="external">char-rnn-tf(TensorFlow版本)</a>， <a href="https://github.com/hit-computer/char-rnn" target="_blank" rel="external">char-rnn(theano版本)</a>）。<br><br>首先介绍ACL2009年的一篇论文吧，题目为<a href="http://students.lti.cs.cmu.edu/11899/files/P09-1024-StructureSummaries.pdf" target="_blank">《Automatically generating Wikipedia articles: a structure-aware approach》</a>。这篇论文和其他几篇论文都不一样，该论文发表于2009年，是在deep learning开始火起来之前，所以论文中使用的方法是基于文本抽取的，作者采用从大量网络文本资源中抽取得到相关句子然后组织成一篇Wikipedia。由于Wikipedia里的文章结构比较规整，所以作者先通过分析Wikipedia的文章，学习出一种结构（得到Wikipedia page的子话题或者叫子模块），比如要生成关于3-M Syndrome的Wikipedia，通过分析和3-M Syndrome相似的其他Wikipedia得到应该有以下一些子话题（子模块）：Diagnosis，Cause，Symptom，Treatment。然后利用搜索引擎搜索得到每个子话题相关的pages，在从每个page中抽取得到相关文段，最后将这些文段组织成一篇Wikipedia。<br><br>第二篇论文是做对话生成的，由于作者使用的对话语料数据是来自于电影，所以论文题目为<a href="https://arxiv.org/pdf/1507.04808v1.pdf" target="_blank">《Hierarchical Neural Network Generative Models for Movie Dialogues》</a>。之前大量的对话系统一般都是单轮对话，这篇论文的模型是对对轮对话进行建模。模型的基本结构依旧是很火的Encoder-Decoder结构，相当于对message进行Encoder，Decoder出response，然而作者在这个基础上加入了一层RNN，用来model之前的对话信息。模型结果如下图所示，<br><img src="http://glacier.iego.net/wp-content/uploads/2016/11/summarize_1.jpg" alt="summarize_1" style="width:520px" class="alignnone size-full wp-image-505"><br><br>第三篇接着介绍对话生成，这篇论文是EMNLP 2015年的，题目为<a href="https://arxiv.org/pdf/1508.01745v2.pdf" target="_blank">《Semantically Conditioned LSTM-based Natural Language Generation for Spoken Dialogue Systems》</a>。这篇论文的motivation就是要生成指定信息的文本，模型用one-hot向量来刻画要生成信息，借鉴LSTM门的思想，在控制信息（one-hot向量）这里设一道门，控制信息部分流入LSTM中，决定当前生成的内容，同时控制信息更新。然后采用多层LSTM，为了防止过拟合加入了dropout，这部分就没有太多新颖性了。<br><br>第四篇论文也是做对话生成的，这篇论文主要要解决回复生成中安全回复的问题（即回复生成任务中，模型总是倾向于回复哪些安全的，但又缺乏实际语义的句子，比如，“知道了”，“是的”，“呵呵”等），论文题目为<a href="https://arxiv.org/pdf/1607.00970v2.pdf" target="_blank">《Sequence to Backward and Forward Sequences: A Content-Introducing Approach to Generative Short-Text Conversation》</a>。其实论文的思想很简单，但来了一个message后，先利用传统的方法根据这个message在大量对话语料中检索得到一个<strong>词</strong>（论文中采用PMI计算得到）,这个词决定了生成的response的基本信息（即生成的response要包含该词）。由于这个词可能出现在response中的任何一个位置中，所以作者想了一个非常巧妙的方法，即利用forward sequence生成该词后面的部分，利用backward sequence生成前面部分。<br><br>第五篇论文不再是对话生成方面的了，论文题目为<a href="http://www.aclweb.org/anthology/P/P16/P16-1222.pdf" target="_blank">《Chinese Couplet Generation with Neural Network Structures》</a>，是今年ACL的一篇论文。个人觉得这篇论文的亮点就在polishing schema上，其实我总感觉这部分有点类似于强化学习。作者在传统的Encoder-Decoder基础上加上了polishing schema结构，作者认为在对联生成任务中，直接由Decoder模块生成的结果并不能满足要求，加入一个迭代优化的模块来不断修正生成的结果，简单的说就是将生成的结果再次作为一个RNN的输入，RNN输出修改后的结果，经过多次修改得到最终理想的结果。模型结果如下图，<br><img src="http://glacier.iego.net/wp-content/uploads/2016/11/summarize_2.jpg" alt="summarize_2" width="634" height="221" class="alignnone size-full wp-image-510"><br><br>第六篇论文和上一篇比较类似，是做中国古诗生成的，题目为<a href="https://arxiv.org/ftp/arxiv/papers/1604/1604.01537.pdf" target="_blank">《Generating Chinese Classical Poems with RNN Encoder-Decoder》</a>。论文在模型方面创新性并不大，基本就是Encoder-Decoder加上Attention结构，Encoder上一句诗词来Decoder下一句诗词。不过有个可以值得借鉴的小trick，就是中国古诗中平仄押韵很重要，也就是说每句诗词的最后一个字很重要（这个字需要保证平仄规则），所以作者在decoder时先生成最后一个字，然后采用倒叙生成的方式生成整句诗。<br><br>第七篇论文很有意思，是做程序代码生成的（这是要打算抢程序员饭碗啊，本是同根生相煎何太急，哈哈哈~），这是Google Deepmind他们的工作，论文题目为<a href="https://arxiv.org/pdf/1603.06744v2.pdf" target="_blank">《Latent Predictor Networks for Code Generation》</a>。作者在构造训练数据时很有意思，利用的是卡牌游戏的代码数据，即在这些卡牌游戏中每张卡牌都包含一些信息，而作者希望利用卡牌上的信息生成对应程序代码中的类。模型比较复杂，结构如下，<br><img src="http://glacier.iego.net/wp-content/uploads/2016/11/summarize_3.jpg" alt="summarize_3" width="599" height="353" class="alignnone size-full wp-image-512"><br><br>第八篇是做图片描述生成的，这应该是比较早做图片描述生成的论文，<a href="https://arxiv.org/pdf/1411.4555v2.pdf" target="_blank">《Show and Tell: A Neural Image Caption Generator》</a>。论文在现在看来基本没有什么新颖，就是利用CNN将图片表示成一个向量，然后该向量作为LSTM的初始输入，利用LSTM生成描述文本。karpathy这人做了类似的工作，并且在github上放了相应的代码，具体可以参考这份代码，github传送门：<a href="https://github.com/karpathy/neuraltalk" target="_blank">neuraltalk</a>。<br><br>第九篇论文是华为诺亚方舟实验室的<a href="http://arxiv.org/abs/1603.06393" target="_blank">《Incorporating Copying Mechanism in Sequence-to-Sequence Learning》</a>。作者主要想解决在对话系统中或摘要生成中，和输入文本中相同的部分，这部分大多是一些命名实体（人名，地名，机构名），而这些词大多都不在词表中，所以生成的时很难生成这些词，所以作者在模型中引入一个copy机制，直接从输入中拷贝到生成的结果中。<br><br>第十篇是用强化学习做文本生成的，题目为<a href="https://arxiv.org/pdf/1510.09202v1.pdf" target="_blank">《Generating Text with Deep Reinforcement Learning》</a>。模型思想就是利用强化学习来不断修正decoder生成的结果，agent的reward作者直接采用评价指标blue值作为reward，这部分有点类似于直接将blue作为了优化目标。模型结构如下图所示，<br><img src="http://glacier.iego.net/wp-content/uploads/2016/11/summarize_4.jpg" alt="summarize_4" width="413" height="213" class="alignnone size-full wp-image-515"><br><br>文本生成任务中的结果评价一直是一个比较困难的问题，上述大部分论文都是直接采用机器翻译中的blue评价指标，而最后这篇论文提出了一种blue的变种，专门用于评价生成任务，论文题目为<a href="https://arxiv.org/pdf/1506.06863v2.pdf" target="_blank">《deltaBLEU: A Discriminative Metric for Generation Tasks with Intrinsically Diverse Targets》</a>。<br></li><br><br><li><br><h3>向量化（embedding/distributed representations）</h3><br>从Google的word2vec开始，关于向量化的模型就开始不断火起来了，各种模型层出不穷，几乎快到了万物皆可向量化。这部分主要看了7篇论文。对向量化感兴趣的可以看一下这个模型（github传送门：<a href="https://github.com/hit-computer/Phrase2Vec" target="_blank" rel="external">Phrase2Vec</a>），模型借鉴了word2vec的思想，将短语（Phrase）向量化。<br><br>首先介绍word2vec的作者的另一项工作吧，doc2vec，论文题目为<a href="https://arxiv.org/pdf/1405.4053v2.pdf" target="_blank">《Distributed Representations of Sentences and Documents》</a>。其实论文的思想和word2vec基本大同小异，就是在每次利用上下文预测当前词时在上下文的词向量部分加入了一个虚拟向量，这个向量就可以看作是document的向量表示。作者的这个模型缺点还是蛮明显的，就是来了一篇新的文本时，没有办法利用以及训练好的模型对其进行向量化，需要和原来所有的训练数据一起重新训练。<br><br>第二篇是Jiwei Li他们的一部分工作，<a href="http://arxiv.org/abs/1506.01057" target="_blank">《A Hierarchical Neural Autoencoder for Paragraphs and Documents》</a>（github传送门：<a href="https://github.com/jiweil/Hierarchical-Neural-Autoencoder" target="_blank">Hierarchical-Neural-Autoencoder</a>）。本质就是一个auto-encoder的模型，由于作者是要将文本表示成向量，所以模型采用的是层次化的RNN，即先从词学习句子表示（句子层RNN），再从句子表示学习文本表示（文本层RNN），这种层次化的结构正好model了语言中由词构成句子、由句子构成篇章的组织结构。同样的，在decoder部分也是层次化的结构，即先decoder得到句子向量，再更加句子向量decoder产生一个个的词。<br><br>第三篇论文是NIPS2015上的一篇论文，<a href="http://papers.nips.cc/paper/5950-skip-thought-vectors" target="_blank">《Skip-Thought Vectors》</a>，github传送门：<a href="https://github.com/ryankiros/skip-thoughts" target="_blank">skip-thoughts</a>。这篇论文是借鉴word2vec的思想来学习句子向量，如果和word2vec一样每个句子对应一个向量，这样参数太多而且太稀疏了。所以，作者巧妙的利用了encoder-RNN来学习句子表示，同时decoder-RNN分别预测该句子的上一句和下一句。<br>以上两篇论文在我的另一篇博客中有详细介绍（<a href="http://glacier.iego.net/deep-learning%E5%9C%A8nlp%E7%9A%84%E5%BA%94%E7%94%A8-encoder-decoder%E7%BB%93%E6%9E%84%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" target="_blank">《DEEP LEARNING在NLP中的应用——ENCODER-DECODER结构学习笔记》</a>）。<br><br>第四篇是微软他们的工作，论文题目为<a href="https://www.microsoft.com/en-us/research/publication/doc2sent2vec-a-novel-two-phase-approach-for-learning-document-representation/" target="_blank">《Doc2Sent2Vec: A Novel Two-Phase Approach for Learning Document Representation》</a>。其实这篇论文和doc2vec那篇差不多，不过作者把文本向量、句子向量、词向量在一个模型中一起学习了，但不是采用的encoder-RNN那种模型结构，而是直接把文本向量、句子向量、词向量都认为成了模型参数，利用上下文预测当前词的思想来学习这些参数，基本和doc2vec思想比较接近。<br><br>第五篇是ACL2016年的一篇short paper，题目为<a href="https://arxiv.org/pdf/1605.03481v2.pdf" target="_blank">《Tweet2Vec: Character-Based Distributed Representations for Social Media》</a>。这篇论文在模型上创新新并不强，不过却很好的解决了一个问题，就是在tweet这样的社交媒体中往往会有一些奇奇怪怪的单词或者一些特别的符号以及少见的缩写，如果把所有这些都加入到词表中，会导致词表及其庞大，并且依旧不能完全解决未登录词的问题。所以，作者就想到了char-base的encoder-RNN，也是是每次输入的RNN的不是词向量而是字符向量，至于如何指导encoder-RNN学习tweet的vec，可以采用auto-encoder的方式，不过这篇论文中作者采用的是利用tweet的hashtag作为预测目标学习tweet向量。<br><br>第六篇也是关于学习tweet向量表示的论文，这是SIGIR2016年的一篇paper，题目为<a href="https://arxiv.org/pdf/1607.07514v1.pdf" target="_blank">《Tweet2Vec: Learning Tweet Embeddings Using Character-level CNN-LSTM Encoder-Decoder》</a>。这篇论文的创新点在利用CNN从字符向量学到一些深层的表示（不是词的向量表示），然后再将这些向量输入到一个RNN层学习整句tweet的语义表示。训练过程类似于auto-encoder，即decoder根据语义表示还原出原tweet。<br><br>第七篇是2016年AAAI的一篇paper，题目为<a href="https://arxiv.org/pdf/1508.06615v4.pdf" target="_blank">《Character-Aware Neural Language Models》</a>。这三篇论文有一个非常明显的共同之处就是都是以字符作为输入的，同样这篇论文输入的也是字符向量，然后利用CNN模型学习得到一个词的向量表示，再接入一个highway结构，最后输入到一个RNN中，训练一个language model（就是根据$x_1,x_2,…,x_i$来预测$x_{i+1}$）。<br></li><br></ul>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+            <a href="/tags/深度学习/" rel="tag"># 深度学习</a>
+          
+            <a href="/tags/NLP/" rel="tag"># NLP</a>
+          
+            <a href="/tags/文本生成/" rel="tag"># 文本生成</a>
+          
+            <a href="/tags/向量化/" rel="tag"># 向量化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/12/paper-reading-1/" rel="next" title="研一一年论文总结（上）">
+                <i class="fa fa-chevron-left"></i> 研一一年论文总结（上）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="Glacier" />
+          <p class="site-author-name" itemprop="name">Glacier</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">文本生成（Text Generation）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">向量化（embedding/distributed representations）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Glacier</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://hit-computer-github-io.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/06/12/paper-reading-2/';
+          this.page.identifier = '2017/06/12/paper-reading-2/';
+          this.page.title = '研一一年论文总结（下）';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://hit-computer-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

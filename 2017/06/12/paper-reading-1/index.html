@@ -1,0 +1,815 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="机器学习,深度学习,NLP,主题模型,关键词抽取,文摘,标签推荐,文本分类," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="转眼间研究生第一年马上就要结束了，再过几天就要进入研二了，是时候把研一这一年看过的论文做一个简单的总结了，不过本人水平有限，有不足和错误的地方还望海涵和指出。本人目前从事NLP相关的研究，所以论文基本都是NLP方向的，这次按照NLP任务对所看过的论文进行分类规整一下。">
+<meta name="keywords" content="机器学习,深度学习,NLP,主题模型,关键词抽取,文摘,标签推荐,文本分类">
+<meta property="og:type" content="article">
+<meta property="og:title" content="研一一年论文总结（上）">
+<meta property="og:url" content="http://yoursite.com/2017/06/12/paper-reading-1/index.html">
+<meta property="og:site_name" content="Glacier&#39;s Blog">
+<meta property="og:description" content="转眼间研究生第一年马上就要结束了，再过几天就要进入研二了，是时候把研一这一年看过的论文做一个简单的总结了，不过本人水平有限，有不足和错误的地方还望海涵和指出。本人目前从事NLP相关的研究，所以论文基本都是NLP方向的，这次按照NLP任务对所看过的论文进行分类规整一下。">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2016/09/paper-1.png">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2016/09/paper-2.png">
+<meta property="og:updated_time" content="2017-06-12T06:39:20.592Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="研一一年论文总结（上）">
+<meta name="twitter:description" content="转眼间研究生第一年马上就要结束了，再过几天就要进入研二了，是时候把研一这一年看过的论文做一个简单的总结了，不过本人水平有限，有不足和错误的地方还望海涵和指出。本人目前从事NLP相关的研究，所以论文基本都是NLP方向的，这次按照NLP任务对所看过的论文进行分类规整一下。">
+<meta name="twitter:image" content="http://glacier.iego.net/wp-content/uploads/2016/09/paper-1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/12/paper-reading-1/"/>
+
+
+
+
+
+  <title>研一一年论文总结（上） | Glacier's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=62554609";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Glacier's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/12/paper-reading-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Glacier">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Glacier's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">研一一年论文总结（上）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-12T13:59:05+08:00">
+                2017-06-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/论文阅读/" itemprop="url" rel="index">
+                    <span itemprop="name">论文阅读</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/06/12/paper-reading-1/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/06/12/paper-reading-1/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>转眼间研究生第一年马上就要结束了，再过几天就要进入研二了，是时候把研一这一年看过的论文做一个简单的总结了，不过本人水平有限，有不足和错误的地方还望海涵和指出。<br>本人目前从事NLP相关的研究，所以论文基本都是NLP方向的，这次按照<strong>NLP任务</strong>对所看过的论文进行分类规整一下。<a id="more"></a></p>
+<ul><br><li><h3>主题模型（topic model）</h3><br>总共看了三篇关于主题模型的，其中有两篇都是今年ACL的论文。<br><br>第一篇论文题目为<a href="http://arxiv.org/abs/1604.00126?context=cs.CL" target="_blank">《Nonparametric Spherical Topic Modeling with Word Embeddings》</a>。这篇论文将topic model和word embedding相结合，按照作者的观点算是把topic model的缺点用word embedding来弥补了。作者认为传统的topic model不能很好的解释，而基于分布表示的word embedding却能够弥补这一缺陷，所以作者将topic model和word embedding相结合取得了非常不错的结果。word embedding需要提前训练好，作为模型的输入，模型整体结构和LDA差不多也是一个图模型，只是在最后预测词的时候改为预测词向量而已，利用了von Mises-Fisher分布。确切的说，在图模型这部分作者参考的还不是LDA，而是HDP（hierarchical Dirichlet Process），它可以自动推断主题数目，无需用户指定。<br><br>第二篇论文题为<a href="http://arxiv.org/abs/1606.02979" target="_blank">《Generative Topic Embedding: a Continuous Representation of Documents (Extended Version with Proofs)》</a>。这篇论文和上一篇一样，也是ACL2016年的论文，而且也是把向量融入到了topic model中。不过略有不同的地方是这篇论文是将词向量和主题模型一起训练，而且还会将主题也表示成向量。这依旧也是一个概率图模型，在训练模型的时候将word embedding和topic embedding分开训练，先忽略topic，得到word embedding（这部分类似于PSDVec模型），然后将word embedding视为常量，训练得到topic embedding。<br><br>第三篇论文时间会稍微有一点久远，是NAACL2010的一篇论文，题目为<a href="http://dl.acm.org/citation.cfm?id=1858011" target="_blank">《Automatic evaluation of topic coherence》</a>。这篇论文主要研究如何自动评价主题模型结果的质量，作者实验了很多方法，通过比较这些方法评价结果和人工评价结果的一致性来得出这些方法的优劣。自动评价方法其实挺简单的，具体做法为建设某个主题下有n个词，那么计算这些词两两之间的相似度，这样得到$\dbinom{n}{2}$个值，那么该主题的得分可以有两个一个是这些值的mean，另一个是这些值的median。而不同方法之间的区别主要就是计算$Sim(W_i,W_j)$所采用的方法不同，作者通过大量的实验，得出结论利用Wikipedia采用PMI计算$Sim(W_i,W_j)$与人工评价结果最为接近。</li><br><li><h3>关键词抽取</h3><br>关键词抽取任务相关的论文会比较多一些，总共看了6篇论文。<br><br>首推第一篇论文，<a href="https://www.researchgate.net/publication/221013097_TextRank_Bringing_Order_into_Text" target="_blank">《TextRank: Bringing Order into Texts》</a>（Github传送门：<a href="https://github.com/letiantian/TextRank4ZH" target="_blank">TextRank4ZH</a>）。这是emnlp2004的一篇论文，论文并不仅仅只是正对关键词抽取，论文的另一个任务是关键句抽取（相当于抽取式摘要任务）。其实论文的方法挺好理解的，就是将候选词（比如名词和动词）表示成图上的一个节点，如果两个词在窗口W中有共现这对应两个节点存在一条边，最后再在这个图利用PageRank算法对候选词进行ranking，抽取得到关键词。关键句抽取方法类似，也是将每个句子表示成一个节点，然后根据作者定义的公式计算$Sim(S_i,S_j)$，最后利用PageRank的改进公式对句子进行ranking，得到关键句。<br><br>第二篇推荐一篇综述，<a href="http://anthology.aclweb.org/P/P14/P14-1119.pdf" target="_blank">《Automatic Keyphrase Extraction: A Survey of the State of the Art》</a>，这是ACL2014年的论文，差不多囊括了2014年前state-of-the-art方法。关键短语抽取任务，可以采用有监督的模型，也可以采用无监督的模型。先说有监督方法吧，这类方法基本都是将关键短语抽取任务看做是一个分类任务，利用分类算法来解决问题。具体做法是先筛选出候选词（获选短语），对每个词提取特性，利用训练数据训练得到一个分类器，这个分类器能够解答某个词（短语）是不是关键词（短语），相当于一个二分类任务。非监督的方法比较多，作者将其分为了四类。第一类，Graph-Based Ranking，这个方法很好理解，上一篇论文就是这种方法的代表。第二类，Topic-Based Clustering，下一篇论文就是该类方法的代表。第三类，Simultaneous Learning，大致思想是把关键句抽取和关键词抽取同时建模，同时训练，代表方法是构建三个图S-S graph、S-W graph、W-W graph，然后迭代收敛最后得到top分值的词。第四类，Language Model。<br><br>第三篇是一篇EMNLP2009的论文，题目为<a href="http://dl.acm.org/citation.cfm?id=1699544" target="_blank">《Clustering to find exemplar terms for keyphrase extraction》</a>。作者认为好的关键短语需要满足三个条件：可理解性，和主题相关性，以及好的覆盖性（即能够包含文本的各个topic）。作者的method包含4个step：1.候选term筛选，这部分主要就是过滤停用词；2.计算term之间相似度，这部分是该方法的关键，就是计算$Sim(term_i,term_j)$；3.根据相似度进行聚类，从每个cluster中找到exemplar terms；4.将exemplar terms作为种子节点，利用权重传播算法得到关键短语。<br><br>第四篇论文的方法属于有监督学习，题为<a href="http://www.cnki.com.cn/Article/CJFDTotal-JSJX200409006.htm" target="_blank">《关键词自动标引的最大熵模型应用研究》</a>。作者的方法就是将关键词抽取任务看做是一个分类任务，先筛选出候选词，然后利用最大熵模型构建分类器。方法关键在于最大熵模型中特征函数的构建，其实这部分就属于特征工程。<br><br>剩下两篇不介绍了…</li><br><br><li><h3>文摘（Summarization）</h3><br>这部分看的论文比较少，就两篇…<br><br>第一篇是EMNLP2015的论文，是做句子的文摘，题为<a href="http://arxiv.org/abs/1509.00685" target="_blank">《A Neural Attention Model for Abstractive Sentence Summarization》</a>。这篇论文很有意思，可千万不要被题目中的Attention骗了哦，这里的Attention和常见的Attention是有区别的，甚至于该论文的method中都没有seq2seq模型，其实Attention是一种思想，常见的seq2seq里的Attention也只能算是一个具体实现罢了。这篇论文最有意思的就是下面这张图了，这张图很好的展示了产生摘要中某个词时源输入中每个词的权重，其实这就是Attention的思想。<br><img class="alignnone size-full wp-image-467" src="http://glacier.iego.net/wp-content/uploads/2016/09/paper-1.png" alt="paper-1" width="342" height="314"><br><br>第二篇是一篇中文论文，是一篇综述，题目为<a href="http://www.cnki.com.cn/Article/CJFDTotal-MESS200803013.htm" target="_blank">《自动文摘评价方法综述》</a>。论文中提到很多常见的文摘评价方法，比如ROUGE，SEE等，简单介绍了这些方法的优劣以及国内外的研究现状。</li><br><li><h3>标签推荐（tag suggestion）</h3><br>这部分总共看过三篇论文，两篇清华的，另外一篇还是千辛万苦找的，感觉这部分的论文不是很多额…<br><br>先介绍结果最好的一篇吧，这是emnlp2011年的一篇论文，题目为<a href="http://dl.acm.org/citation.cfm?id=2145601" target="_blank">《A simple word trigger method for social tag suggestion》</a>。这篇论文中idea是采用翻译模型来解决该任务的，具体而言，作者将文本认为是源语言，将标签认为是目标语言，训练一个翻译模型（论文中用的是IBM Model-1）。但是，这样做有个严重的问题是文本和标签长度严重不一致，这会对翻译模型的效果造成很大的影响。而作者采用了一个非常巧妙的方法来解决这个问题，具体方法是，计算每个tag的权重，然后按照权重sample，使得sample得到的序列和文本长度一致。然后按照下列公式计算标签分值，$Pr(t{\mid}d=W_d)=\sum_{w{\in}W_d}Pr(t{\mid}w)Pr(w{\mid}d)$，其中$Pr(w{\mid}d)$是词w在文档d中的trigger power（相当于权重），而概率$Pr(t{\mid}w)$由训练得到的翻译模型给出。<br><br>第二篇也是清华他们发的，<a href="http://ieeexplore.ieee.org/xpls/icp.jsp?arnumber=5678585" target="_blank">《Modeling Social Annotations via Latent Reason Identification》</a>。这其实是一个概率图模型，每个tag经过以下三个步骤生成：1.生成source，这个是全局建模的，哪些词汇会倾向于成为source；2.由source采样reason，这个是正对当前文本进行建模的，reason就是每个tag的原因（eg. best film就是good movie这个tag的reason）；3.由reason生成tag。图模型如下图所示，<br><img class="alignnone size-full wp-image-471" src="http://glacier.iego.net/wp-content/uploads/2016/09/paper-2.png" alt="paper-2" style="width:500px"><br><br>第三篇论文的方法比较简单，<a href="http://dl.acm.org/citation.cfm?id=2467706" target="_blank">《Automatic tag recommendation for metadata annotation using probabilistic topic modeling》</a>。论文的方法有点类似于协同过滤，模型会将和当前文本相似的文本的tag作为当前文本的tag，按照如下公式计算tag分值，<br>$$P(t{\mid}q,T,D,M)=\frac{TagScore_M(t,q,D)}{\sum_{{\tau}{\in}T}TagScore_M({\tau},q,D)}$$<br>$$TagScore_M(t,q,D)=\sum_{d{\in}D}DocSim_M(q,d,D){\cdot}isTag(t,d)$$<br>公式中$TagScore_M(t,q,D)$是一个tag t和一个文本q之间的相关性，由两部分值决定，文本q和训练数据D中的某篇文本d的相似度$DocSim_M(q,d,D)$和$isTag(t,d)$。$DocSim_M(q,d,D)$这个其实就是一个文本相似度的计算，而$isTag(t,d)$计算就更简单了，如果t是d的tag那么值为1，否则为0。</li><br><li><h3>文本/句子分类（Classification）</h3><br>文本/句子分类任务是一个非常常见和非常基础的NLP任务，解决这类任务的方法或模型大多都可以很好的解决别的任务，至少Google他们认为在图像分类任务上是这样的（<a href="http://arxiv.org/abs/1512.00567" target="_blank">Szegedy C, 2015</a>）。这部分包含5篇论文。<br><br>先介绍两篇用卷积做句子分类的论文吧，这两篇在NLP中引入卷积神经网络做了很多开创性的工作。我们知道在deep learning开始火起来的时候，卷积神经网络在计算机视觉领域取得了突破性成果，从2012年开始ImageNet比赛中前几名基本都是采用的CNN，而事实上CNN除了在CV领域能够取得很好的结果，在NLP中也取得了非常显著的成果，具体可参考我的另外一篇博客<a href="http://glacier.iego.net/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88cnn%EF%BC%89%E5%9C%A8nlp%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/" target="_blank">《卷积神经网络（CNN）在NLP中的应用》</a>。现在介绍第一篇，<a href="http://arxiv.org/abs/1404.2188" target="_blank">《A Convolutional Neural Network for Modelling Sentences》</a>。这篇论文使用的方法是动态卷积，其实就是在pooling的时候取k-max，而k的值在每一个卷积层是不同的（动态变化）。不过，后来用在NLP任务中采用的CNN和这篇论文都不大相同，该论文中是对词向量的每一个维度单独做卷积操作，然后再pooling。而之后的CNN模型大多都是对整个词向量做卷积操作。<br><br>第二篇是一篇非常经典的用CNN做句子分类的论文，<a href="http://arxiv.org/abs/1408.5882" target="_blank">《Convolutional Neural Networks for Sentence Classification》（EMNLP 2014）</a>。论文的思想是将一个句子看作是一副图像，假定一个句子包含m个词，那么$m*d$（d是词向量维度）这个矩阵就可以看作是一副图像，卷积核shape为$n*d$（n为滑动窗口大小），卷积之后得到$m-n+1$个值，再pooling之后得到一个值。作者在句子分类任务的7个语料上，与其他14个模型进行对比，实验结果基本是接近或者超过这些模型的最好结果。论文的另外一个经验性贡献是采用预先训练好的词向量作为embedding初始值能够提升模型性能。<br><br>第三篇论文就不再是句子级的分类了，而是document级的分类，论文的任务是情感分析（实质可以看成是一个分类任务）。论文题目<a href="http://aclweb.org/anthology/D/D15/D15-1167.pdf" target="_blank">《Document Modeling with Gated Recurrent Neural Network for Sentiment Classification》（EMNLP 2015）</a>。由于模型是做document级的分类，因此首先对句子进行建模，学习得到句子表示，然后composition句子的表示得到文本表示，最后接softmax层预测属于不同类别的概率值。这样的层次化结构正好对应语言中由词构成句子，再由句子构成文本的特性，模型首先用CNN（LSTM）学习得到sentence representation，然后再用双向gated neural network学习得到文本的向量表示。实验部分，作者在4个语料上与9个模型进行对比，所有结果都好于其他模型，最好的结果是yelp2015数据集上的accuracy值为0.676。<br><br>第四篇同样是做document级的分类任务，也采用了从词到句子、句子到文本的层次化结构，不同的是加入了attention的网络结构。论文题目，<a href="http://www.aclweb.org/anthology/N16-1174" target="_blank">《Hierarchical Attention Networks for Document Classification》（NAACL 2016）</a>。之前attention结构一般都是在decoder部分，而这篇论文创新性的将attention加在了encoder部分。在做attention的时候，作者将$h_{t-1}$替换成了固定向量$u_w$，按照作者的解释这个向量是固定query“what is the informative word”的high level representation。实验部分，该论文的方法在4个数据集上都超过了第三篇论文的方法，作者还额外增加了两个数据集：Yahoo answer和amazon，最好的结果是在Yahoo answer（有10个类别）上的accuracy值0.785。<br><br>第五篇task是abusive language detection，其实质也可以看成是一个分类任务，对每个句子进行二分类（是/不是abusive language）。这是Yahoo发表的一篇论文，<a href="http://dl.acm.org/citation.cfm?id=2883062" target="_blank">《Abusive Language Detection in Online User Content》（WWW 2016）</a>。模型基于<a href="https://github.com/JohnLangford/vowpal_wabbit" target="_blank">Vowpal Wabbit’s regression model</a>，在此基础上构建特征，作者将特征分为四类：N-gram features，Linguistic features（e.g.句子长度，包含黑名单词数目等），Syntactic features（比如parser树上的父节点以及他们的POS等），Distributional Semantic features（就是词向量）。<br></li><br></ul>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+            <a href="/tags/深度学习/" rel="tag"># 深度学习</a>
+          
+            <a href="/tags/NLP/" rel="tag"># NLP</a>
+          
+            <a href="/tags/主题模型/" rel="tag"># 主题模型</a>
+          
+            <a href="/tags/关键词抽取/" rel="tag"># 关键词抽取</a>
+          
+            <a href="/tags/文摘/" rel="tag"># 文摘</a>
+          
+            <a href="/tags/标签推荐/" rel="tag"># 标签推荐</a>
+          
+            <a href="/tags/文本分类/" rel="tag"># 文本分类</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/12/EM-Algorithm/" rel="next" title="EM算法浅析">
+                <i class="fa fa-chevron-left"></i> EM算法浅析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/12/paper-reading-2/" rel="prev" title="研一一年论文总结（下）">
+                研一一年论文总结（下） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="Glacier" />
+          <p class="site-author-name" itemprop="name">Glacier</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">1.</span> <span class="nav-text">主题模型（topic model）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">2.</span> <span class="nav-text">关键词抽取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">3.</span> <span class="nav-text">文摘（Summarization）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">4.</span> <span class="nav-text">标签推荐（tag suggestion）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#undefined"><span class="nav-number">5.</span> <span class="nav-text">文本/句子分类（Classification）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Glacier</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://hit-computer-github-io.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/06/12/paper-reading-1/';
+          this.page.identifier = '2017/06/12/paper-reading-1/';
+          this.page.title = '研一一年论文总结（上）';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://hit-computer-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
