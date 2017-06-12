@@ -1,0 +1,810 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="机器学习,深度学习,计算机视觉,CNN,VGG," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="Deep Learning最开始就是从CV方向火起来的，而CV中最常用的模型就CNN（卷积神经网络，theano实现一个CNN模型可以参考CNNModel.py）。当然了目前CNN已经不局限于只在CV领域使用，NLP中也开始广泛应用CNN，具体可参看我的另外一篇博客《卷积神经网络（CNN）在NLP中的应用》（github传送门：GRU-or-CNN）。">
+<meta name="keywords" content="机器学习,深度学习,计算机视觉,CNN,VGG">
+<meta property="og:type" content="article">
+<meta property="og:title" content="卷积神经网络初窥——VGG19学习笔记">
+<meta property="og:url" content="http://yoursite.com/2017/06/12/CNN-VGG19/index.html">
+<meta property="og:site_name" content="Glacier&#39;s Blog">
+<meta property="og:description" content="Deep Learning最开始就是从CV方向火起来的，而CV中最常用的模型就CNN（卷积神经网络，theano实现一个CNN模型可以参考CNNModel.py）。当然了目前CNN已经不局限于只在CV领域使用，NLP中也开始广泛应用CNN，具体可参看我的另外一篇博客《卷积神经网络（CNN）在NLP中的应用》（github传送门：GRU-or-CNN）。">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2015/12/vgg.png">
+<meta property="og:updated_time" content="2017-06-12T05:51:31.431Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="卷积神经网络初窥——VGG19学习笔记">
+<meta name="twitter:description" content="Deep Learning最开始就是从CV方向火起来的，而CV中最常用的模型就CNN（卷积神经网络，theano实现一个CNN模型可以参考CNNModel.py）。当然了目前CNN已经不局限于只在CV领域使用，NLP中也开始广泛应用CNN，具体可参看我的另外一篇博客《卷积神经网络（CNN）在NLP中的应用》（github传送门：GRU-or-CNN）。">
+<meta name="twitter:image" content="http://glacier.iego.net/wp-content/uploads/2015/12/vgg.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/12/CNN-VGG19/"/>
+
+
+
+
+
+  <title>卷积神经网络初窥——VGG19学习笔记 | Glacier's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=62554609";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Glacier's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/12/CNN-VGG19/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Glacier">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Glacier's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">卷积神经网络初窥——VGG19学习笔记</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-12T13:20:53+08:00">
+                2017-06-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/深度学习/" itemprop="url" rel="index">
+                    <span itemprop="name">深度学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/06/12/CNN-VGG19/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/06/12/CNN-VGG19/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Deep Learning最开始就是从CV方向火起来的，而CV中最常用的模型就CNN（卷积神经网络，theano实现一个CNN模型可以参考<a href="https://github.com/hit-computer/GRU-or-CNN/blob/master/CNNModel.py" target="_blank" rel="external">CNNModel.py</a>）。当然了目前CNN已经不局限于只在CV领域使用，NLP中也开始广泛应用CNN，具体可参看我的另外一篇博客<a href="http://glacier.iego.net/%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%EF%BC%88cnn%EF%BC%89%E5%9C%A8nlp%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8/" target="_blank" rel="external">《卷积神经网络（CNN）在NLP中的应用》</a>（github传送门：<a href="https://github.com/hit-computer/GRU-or-CNN" target="_blank">GRU-or-CNN</a>）。<a id="more"></a>在<a href="http://image-net.org/challenges/LSVRC/2012/results.html" target="_blank">ILSVRC2012</a>分类任务上，CNN开始崭露头角， Alex Krizhevsky他们的模型取得了16.4%的错误率（远超第二名26.2%的错误率）。而后来的<a href="http://www.robots.ox.ac.uk/~vgg/research/very_deep/" target="_blank">VGGNet</a>模型，在ILSVRC2012分类任务上将top-5的错误率降到了7.3%。VGGNet包含两个模型，VGG-16和VGG-19，就最近而言我见到不少基于这两模型的方法（项目），包括，</p>
+<p><ol><br>    <li>生成图片描述，输入一幅图片，模型生成一句描述该图片的话。github传送门：<a href="https://github.com/karpathy/neuraltalk" target="_blank">neuraltalk</a></li><br>    <li>看图写话，这个有点类似小学生作文啊，是生成图片描述的升级版，就是生成一大段浪漫的话（和训练语料有关）来描述图片内容。github传送门：<a href="https://github.com/ryankiros/neural-storyteller" target="_blank">neural-storyteller</a></li><br>    <li>看图回答问题，这篇论文也很有意思，给定一副图片和一个和图片相关的问题，模型给出答案，比如问图片中有多少个人，或者问桌子旁边是什么。其实模型结构和第一个生成图片描述的模型差不多，也是把图片向量视作RNN的第一个输入，接下来输入为问题。其实论文的亮点在于通过图片表述数据集构建图片问答数据集，这个创新还是值得一赞的。github传送门：<a href="https://github.com/abhshkdz/neural-vqa" target="_blank">neural-vqa</a>。论文传送门：<a href="http://arxiv.org/abs/1505.02074" target="_blank">《Exploring Models and Data for Image Question Answering》(NIPS 2015)</a></li><br>    <li>计算机学绘画，这是2015年NIPS上的一篇论文<a href="http://arxiv.org/abs/1508.06576" target="_blank">《A Neural Algorithm of Artistic Style》</a>。给模型两幅图片，其中一幅为风格图片，则模型会输出另一幅图片使其画风符合风格图片。github传送门：<a href="https://github.com/Lasagne/Recipes/tree/master/examples/styletransfer" target="_blank">Art Style Transfer</a></li><br>    <li>根据涂鸦绘画（相当于计算机参考绘画），这是上一个模型的升级版。给定一张图片，以及该图片的semantic annotations（涂鸦），再给定一张涂鸦（期望生成图片的大致样子），然后计算机就能生成一幅你意愿的图片。论文：<a href="http://arxiv.org/pdf/1603.01768v1.pdf" target="_blank">《Semantic Style Transfer and Turning Two-Bit Doodles into Fine Artwork》</a>，github传送门：<a href="https://github.com/alexjc/neural-doodle" target="_blank">neural-doodle</a></li><br>    <li>这里还有一个非常有意思的模型，虽然没有用到VGG-16或VGG-19，但用到了CNN，其基本思想还是差不多的。模型很有意思，采用对抗学习的思想，模型包含两部分，一部分用于生成图片，另一部分用于判断生成的图片是否是一个合理的图片（比如一张人脸），通过对抗训练，同时提升两部分的性能，最后得到一个生成特定图片的模型（比如一张人脸）。github传送门：<a href="https://github.com/skaae/torch-gan" target="_blank">torch-gan</a></li><br></ol><br>这里插一句，上面列出的6个项目或论文中，前三个都是CV和NLP相结合的应用。CV和NLP都是AI的分支，将两者相结合的应用绝对是AI的一个宏伟梦想，所以CV+NLP基本可以算是之后AI研究的新发展方向了，尤其是在当下deep learning大火的背景下。</p>
+<p>既然VGG-16或VGG-19应用如此广泛，那我们就来简单学一下这两个模型吧。下面以VGG-19为例，来看一下 lasagne实现的版本（lasagne是基于Theano封装的深度学习库）：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> lasagne.layers <span class="keyword">import</span> InputLayer</div><div class="line"><span class="keyword">from</span> lasagne.layers.dnn <span class="keyword">import</span> Conv2DDNNLayer <span class="keyword">as</span> ConvLayer</div><div class="line"><span class="keyword">from</span> lasagne.layers <span class="keyword">import</span> Pool2DLayer <span class="keyword">as</span> PoolLayer</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_model</span><span class="params">()</span>:</span><span class="comment">#构建VGG-19卷积网络</span></div><div class="line">    net = &#123;&#125;</div><div class="line">    net[<span class="string">'input'</span>] = InputLayer((<span class="number">1</span>, <span class="number">3</span>, IMAGE_W, IMAGE_W))</div><div class="line">    net[<span class="string">'conv1_1'</span>] = ConvLayer(net[<span class="string">'input'</span>], <span class="number">64</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'conv1_2'</span>] = ConvLayer(net[<span class="string">'conv1_1'</span>], <span class="number">64</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'pool1'</span>] = PoolLayer(net[<span class="string">'conv1_2'</span>], <span class="number">2</span>, mode=<span class="string">'average_exc_pad'</span>)</div><div class="line">    net[<span class="string">'conv2_1'</span>] = ConvLayer(net[<span class="string">'pool1'</span>], <span class="number">128</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'conv2_2'</span>] = ConvLayer(net[<span class="string">'conv2_1'</span>], <span class="number">128</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'pool2'</span>] = PoolLayer(net[<span class="string">'conv2_2'</span>], <span class="number">2</span>, mode=<span class="string">'average_exc_pad'</span>)</div><div class="line">    net[<span class="string">'conv3_1'</span>] = ConvLayer(net[<span class="string">'pool2'</span>], <span class="number">256</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'conv3_2'</span>] = ConvLayer(net[<span class="string">'conv3_1'</span>], <span class="number">256</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'conv3_3'</span>] = ConvLayer(net[<span class="string">'conv3_2'</span>], <span class="number">256</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'conv3_4'</span>] = ConvLayer(net[<span class="string">'conv3_3'</span>], <span class="number">256</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'pool3'</span>] = PoolLayer(net[<span class="string">'conv3_4'</span>], <span class="number">2</span>, mode=<span class="string">'average_exc_pad'</span>)</div><div class="line">    net[<span class="string">'conv4_1'</span>] = ConvLayer(net[<span class="string">'pool3'</span>], <span class="number">512</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'conv4_2'</span>] = ConvLayer(net[<span class="string">'conv4_1'</span>], <span class="number">512</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'conv4_3'</span>] = ConvLayer(net[<span class="string">'conv4_2'</span>], <span class="number">512</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'conv4_4'</span>] = ConvLayer(net[<span class="string">'conv4_3'</span>], <span class="number">512</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'pool4'</span>] = PoolLayer(net[<span class="string">'conv4_4'</span>], <span class="number">2</span>, mode=<span class="string">'average_exc_pad'</span>)</div><div class="line">    net[<span class="string">'conv5_1'</span>] = ConvLayer(net[<span class="string">'pool4'</span>], <span class="number">512</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'conv5_2'</span>] = ConvLayer(net[<span class="string">'conv5_1'</span>], <span class="number">512</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'conv5_3'</span>] = ConvLayer(net[<span class="string">'conv5_2'</span>], <span class="number">512</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'conv5_4'</span>] = ConvLayer(net[<span class="string">'conv5_3'</span>], <span class="number">512</span>, <span class="number">3</span>, pad=<span class="number">1</span>)</div><div class="line">    net[<span class="string">'pool5'</span>] = PoolLayer(net[<span class="string">'conv5_4'</span>], <span class="number">2</span>, mode=<span class="string">'average_exc_pad'</span>)</div><div class="line"></div><div class="line">    <span class="keyword">return</span> net</div></pre></td></tr></table></figure>
+<p>lasagne实现非常简单，就涉及两个函数Conv2DDNNLayer和Pool2DLayer。Conv2DDNNLayer中重要的就是前4个参数，官方文档为，</p>
+<p><img class="alignnone size-full wp-image-315" src="http://glacier.iego.net/wp-content/uploads/2015/12/vgg.png" alt="vgg" width="751" height="51"></p>
+<p><div></div></p>
+<p style="box-sizing: border-box; margin: 0px 0px 5px;"><span style="font-size: 12px;">2D convolutional layer</span><br><span style="font-size: 12px;">Performs a 2D convolution on its input and optionally adds a bias and applies an elementwise nonlinearity. This is an alternative implementation which uses <span style="box-sizing: border-box; font-family: Consolas, 'Andale Mono WT', 'Andale Mono', 'Lucida Console', 'Lucida Sans Typewriter', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', 'Liberation Mono', 'Nimbus Mono L', Monaco, 'Courier New', Courier, monospace; white-space: nowrap; max-width: 100%; border: 1px solid #e1e4e5; padding: 2px 5px; color: #e74c3c; overflow-x: auto; font-weight: bold; background-color: #ffffff; background-position: initial initial; background-repeat: initial initial;"><span style="box-sizing: border-box;">theano.sandbox.cuda.dnn.dnn_conv</span></span>directly.</span></p>
+
+<p></p>
+<blockquote>
+<p><strong>Parameters</strong>:</p>
+<ul>
+<li><strong>incoming</strong> : a Layer instance or a tuple<br>The layer feeding into this layer, or the expected input shape. The output of this layer should be a 4D tensor, with shape(batch_size, num_input_channels, input_rows, input_columns).</li>
+<li><strong>num_filters</strong> : int<br>The number of learnable convolutional filters this layer has.</li>
+<li><strong>filter_size</strong> : int or iterable of int<br>An integer or a 2-element tuple specifying the size of the filters.</li>
+<li><strong>stride</strong> : int or iterable of int<br>An integer or a 2-element tuple specifying the stride of the convolution operation.</li>
+<li><strong>pad</strong> : int, iterable of int, ‘full’, ‘same’ or ‘valid’ (default: 0)<br>By default, the convolution is only computed where the input and the filter fully overlap (a valid convolution). When stride=1, this yields an output that is smaller than the input by filter_size - 1. The pad argument allows you to implicitly pad the input with zeros, extending the output size.<br>A single integer results in symmetric zero-padding of the given size on all borders, a tuple of two integers allows different symmetric padding per dimension.<br>‘full’ pads with one less than the filter size on both sides. This is equivalent to computing the convolution wherever the input and the filter overlap by at least one position.<br>‘same’ pads with half the filter size (rounded down) on both sides. Whenstride=1 this results in an output size equal to the input size. Even filter size is not supported.<br>‘valid’ is an alias for 0 (no padding / a valid convolution).<br>Note that ‘full’ and ‘same’ can be faster than equivalent integer values due to optimizations by Theano.</li>
+<li><strong>untie_biases</strong> : bool (default: False)<br>If False, the layer will have a bias parameter for each channel, which is shared across all positions in this channel. As a result, the b attribute will be a vector (1D).<br>If True, the layer will have separate bias parameters for each position in each channel. As a result, the b attribute will be a 3D tensor.</li>
+<li><strong>W</strong> : Theano shared variable, expression, numpy array or callable<br>Initial value, expression or initializer for the weights. These should be a 4D tensor with shape(num_filters, num_input_channels, filter_rows, filter_columns). Seelasagne.utils.create_param() for more information.<br><strong>b</strong> : Theano shared variable, expression, numpy array, callable or None<br>Initial value, expression or initializer for the biases. If set to None, the layer will have no biases. Otherwise, biases should be a 1D array with shape(num_filters,) if untied_biases is set to False. If it is set to True, its shape should be (num_filters, output_rows, output_columns) instead. Seelasagne.utils.create_param() for more information.</li>
+<li><strong>nonlinearity</strong> : callable or None<br>The nonlinearity that is applied to the layer activations. If None is provided, the layer will be linear.</li>
+<li><strong>flip_filters</strong> : bool (default: False)<br>Whether to flip the filters and perform a convolution, or not to flip them and perform a correlation. Flipping adds a bit of overhead, so it is disabled by default. In most cases this does not make a difference anyway because the filters are learnt. However, flip_filters should be set to True if weights are loaded into it that were learnt using a regularlasagne.layers.Conv2DLayer, for example.</li>
+<li><strong>**kwargs</strong><br>Any additional keyword arguments are passed to the Layer superclass.</li>
+</ul>
+</blockquote>
+<p>简单解释一下Conv2DDNNLayer，第一参数为输入数据，第二个参数是卷积核的个数，第三个参数是卷积核的size（输入一个tuple或单个值，如果只输入单个值i，则size=(i,i)），pad表示在边界上添加多少个值为0的像素点。比如，<br>输入：$n*c_i*h_i*w_i$<br>输出：$n*c_o*h_o*w_o$，其中$h_o = (h_i + 2 * pad_h - kernel_h) /stride_h + 1$，$w_o$通过同样的方法计算。<br>公式中$n$表示的batch_size，$c_i$表示输入通道数目（num_input_channels），$c_o$表示输出通道数目（既num_filters）。当前层的卷积核，既参数矩阵W的shape为$(c_o,c_i,kernel_h,kernel_w)$，具体计算过程为对输入的$c_i$个通道用shape为$(c_i,kernel_h,kernel_w)$对其进行卷积（每个通道对应一个卷积核$(kernel_h,kernel_w)$，这样得到$c_i$个卷积结果，将这个$c_i$结果叠加，既得到一个shape为$(h_o,w_o)$这样的输出）。有$c_o$个不同的卷积核，所以得到$c_o$个shape为$(h_o,w_o)$的输出。<br>激活函数默认为 <strong>rectify</strong>。<br>Pool2DLayer也是一样的，第二个参数是pool核的size，同样输入单值i，size=(i,i)。mode=’average_exc_pad’表示取平均。Pooling是对每一个输入通道进行单独操作，没有参数，同时也不会改变通道的数目。</p>
+<p>下面看以mxnet的实现（mxnet也是一个深度学习库，支持python等多种语言，github传送门：<a href="https://github.com/dmlc/mxnet" target="_blank">mxnet</a>），比lasagne稍微复杂一点，但更加清晰。可以很清晰的看出VGG-19的模型层次，基本就是：卷积-&gt;非线性化-&gt;再卷积-&gt;非线性化-&gt;…-&gt;Pooling-&gt;下一个卷积层…</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line">data = mx.sym.Variable(<span class="string">"data"</span>)</div><div class="line">    conv1_1 = mx.symbol.Convolution(name=<span class="string">'conv1_1'</span>, data=data , num_filter=<span class="number">64</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu1_1 = mx.symbol.Activation(name=<span class="string">'relu1_1'</span>, data=conv1_1 , act_type=<span class="string">'relu'</span>)</div><div class="line">    conv1_2 = mx.symbol.Convolution(name=<span class="string">'conv1_2'</span>, data=relu1_1 , num_filter=<span class="number">64</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu1_2 = mx.symbol.Activation(name=<span class="string">'relu1_2'</span>, data=conv1_2 , act_type=<span class="string">'relu'</span>)</div><div class="line">    pool1 = mx.symbol.Pooling(name=<span class="string">'pool1'</span>, data=relu1_2 , pad=(<span class="number">0</span>,<span class="number">0</span>), kernel=(<span class="number">2</span>,<span class="number">2</span>), stride=(<span class="number">2</span>,<span class="number">2</span>), pool_type=<span class="string">'avg'</span>)</div><div class="line">    conv2_1 = mx.symbol.Convolution(name=<span class="string">'conv2_1'</span>, data=pool1 , num_filter=<span class="number">128</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu2_1 = mx.symbol.Activation(name=<span class="string">'relu2_1'</span>, data=conv2_1 , act_type=<span class="string">'relu'</span>)</div><div class="line">    conv2_2 = mx.symbol.Convolution(name=<span class="string">'conv2_2'</span>, data=relu2_1 , num_filter=<span class="number">128</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu2_2 = mx.symbol.Activation(name=<span class="string">'relu2_2'</span>, data=conv2_2 , act_type=<span class="string">'relu'</span>)</div><div class="line">    pool2 = mx.symbol.Pooling(name=<span class="string">'pool2'</span>, data=relu2_2 , pad=(<span class="number">0</span>,<span class="number">0</span>), kernel=(<span class="number">2</span>,<span class="number">2</span>), stride=(<span class="number">2</span>,<span class="number">2</span>), pool_type=<span class="string">'avg'</span>)</div><div class="line">    conv3_1 = mx.symbol.Convolution(name=<span class="string">'conv3_1'</span>, data=pool2 , num_filter=<span class="number">256</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu3_1 = mx.symbol.Activation(name=<span class="string">'relu3_1'</span>, data=conv3_1 , act_type=<span class="string">'relu'</span>)</div><div class="line">    conv3_2 = mx.symbol.Convolution(name=<span class="string">'conv3_2'</span>, data=relu3_1 , num_filter=<span class="number">256</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu3_2 = mx.symbol.Activation(name=<span class="string">'relu3_2'</span>, data=conv3_2 , act_type=<span class="string">'relu'</span>)</div><div class="line">    conv3_3 = mx.symbol.Convolution(name=<span class="string">'conv3_3'</span>, data=relu3_2 , num_filter=<span class="number">256</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu3_3 = mx.symbol.Activation(name=<span class="string">'relu3_3'</span>, data=conv3_3 , act_type=<span class="string">'relu'</span>)</div><div class="line">    conv3_4 = mx.symbol.Convolution(name=<span class="string">'conv3_4'</span>, data=relu3_3 , num_filter=<span class="number">256</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu3_4 = mx.symbol.Activation(name=<span class="string">'relu3_4'</span>, data=conv3_4 , act_type=<span class="string">'relu'</span>)</div><div class="line">    pool3 = mx.symbol.Pooling(name=<span class="string">'pool3'</span>, data=relu3_4 , pad=(<span class="number">0</span>,<span class="number">0</span>), kernel=(<span class="number">2</span>,<span class="number">2</span>), stride=(<span class="number">2</span>,<span class="number">2</span>), pool_type=<span class="string">'avg'</span>)</div><div class="line">    conv4_1 = mx.symbol.Convolution(name=<span class="string">'conv4_1'</span>, data=pool3 , num_filter=<span class="number">512</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu4_1 = mx.symbol.Activation(name=<span class="string">'relu4_1'</span>, data=conv4_1 , act_type=<span class="string">'relu'</span>)</div><div class="line">    conv4_2 = mx.symbol.Convolution(name=<span class="string">'conv4_2'</span>, data=relu4_1 , num_filter=<span class="number">512</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu4_2 = mx.symbol.Activation(name=<span class="string">'relu4_2'</span>, data=conv4_2 , act_type=<span class="string">'relu'</span>)</div><div class="line">    conv4_3 = mx.symbol.Convolution(name=<span class="string">'conv4_3'</span>, data=relu4_2 , num_filter=<span class="number">512</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu4_3 = mx.symbol.Activation(name=<span class="string">'relu4_3'</span>, data=conv4_3 , act_type=<span class="string">'relu'</span>)</div><div class="line">    conv4_4 = mx.symbol.Convolution(name=<span class="string">'conv4_4'</span>, data=relu4_3 , num_filter=<span class="number">512</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu4_4 = mx.symbol.Activation(name=<span class="string">'relu4_4'</span>, data=conv4_4 , act_type=<span class="string">'relu'</span>)</div><div class="line">    pool4 = mx.symbol.Pooling(name=<span class="string">'pool4'</span>, data=relu4_4 , pad=(<span class="number">0</span>,<span class="number">0</span>), kernel=(<span class="number">2</span>,<span class="number">2</span>), stride=(<span class="number">2</span>,<span class="number">2</span>), pool_type=<span class="string">'avg'</span>)</div><div class="line">    conv5_1 = mx.symbol.Convolution(name=<span class="string">'conv5_1'</span>, data=pool4 , num_filter=<span class="number">512</span>, pad=(<span class="number">1</span>,<span class="number">1</span>), kernel=(<span class="number">3</span>,<span class="number">3</span>), stride=(<span class="number">1</span>,<span class="number">1</span>), no_bias=<span class="keyword">False</span>, workspace=<span class="number">1024</span>)</div><div class="line">    relu5_1 = mx.symbol.Activation(name=<span class="string">'relu5_1'</span>, data=conv5_1 , act_type=<span class="string">'relu'</span>)</div><div class="line"></div><div class="line">    <span class="comment"># style and content layers</span></div><div class="line">    style = mx.sym.Group([relu1_1, relu2_1, relu3_1, relu4_1, relu5_1])</div><div class="line">    content = mx.sym.Group([relu4_2])</div><div class="line">    out = mx.sym.Group([style, content])</div></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+            <a href="/tags/深度学习/" rel="tag"># 深度学习</a>
+          
+            <a href="/tags/计算机视觉/" rel="tag"># 计算机视觉</a>
+          
+            <a href="/tags/CNN/" rel="tag"># CNN</a>
+          
+            <a href="/tags/VGG/" rel="tag"># VGG</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/10/CNN-in-NLP/" rel="next" title="卷积神经网络（CNN）在NLP中的应用">
+                <i class="fa fa-chevron-left"></i> 卷积神经网络（CNN）在NLP中的应用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/12/EM-Algorithm/" rel="prev" title="EM算法浅析">
+                EM算法浅析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="Glacier" />
+          <p class="site-author-name" itemprop="name">Glacier</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Glacier</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://hit-computer-github-io.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/06/12/CNN-VGG19/';
+          this.page.identifier = '2017/06/12/CNN-VGG19/';
+          this.page.title = '卷积神经网络初窥——VGG19学习笔记';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://hit-computer-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

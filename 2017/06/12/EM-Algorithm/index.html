@@ -1,0 +1,786 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="机器学习,概率论,EM,期望,混合高斯模型," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.1" />
+
+
+
+
+
+
+<meta name="description" content="首先明白EM算法是什么，它是一个优化算法，而且大多数情况针对的是最大似然问题。其实从名字也可以看出EM算法的用途，最大期望算法，“期望”二字表明算法主要针对概率问题，“最大”说明这是在求解优化问题。">
+<meta name="keywords" content="机器学习,概率论,EM,期望,混合高斯模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EM算法浅析">
+<meta property="og:url" content="http://yoursite.com/2017/06/12/EM-Algorithm/index.html">
+<meta property="og:site_name" content="Glacier&#39;s Blog">
+<meta property="og:description" content="首先明白EM算法是什么，它是一个优化算法，而且大多数情况针对的是最大似然问题。其实从名字也可以看出EM算法的用途，最大期望算法，“期望”二字表明算法主要针对概率问题，“最大”说明这是在求解优化问题。">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2015/04/EM.png">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2015/04/EM_1.png">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2015/04/EM_2.png">
+<meta property="og:image" content="http://glacier.iego.net/wp-content/uploads/2015/04/EM_3-1.png">
+<meta property="og:updated_time" content="2017-06-12T05:35:50.750Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="EM算法浅析">
+<meta name="twitter:description" content="首先明白EM算法是什么，它是一个优化算法，而且大多数情况针对的是最大似然问题。其实从名字也可以看出EM算法的用途，最大期望算法，“期望”二字表明算法主要针对概率问题，“最大”说明这是在求解优化问题。">
+<meta name="twitter:image" content="http://glacier.iego.net/wp-content/uploads/2015/04/EM.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/06/12/EM-Algorithm/"/>
+
+
+
+
+
+  <title>EM算法浅析 | Glacier's Blog</title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//tajs.qq.com/stats?sId=62554609";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Glacier's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/06/12/EM-Algorithm/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Glacier">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Glacier's Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">EM算法浅析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-12T13:31:39+08:00">
+                2017-06-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/机器学习/" itemprop="url" rel="index">
+                    <span itemprop="name">机器学习</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2017/06/12/EM-Algorithm/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2017/06/12/EM-Algorithm/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>首先明白EM算法是什么，它是一个优化算法，而且大多数情况针对的是最大似然问题。其实从名字也可以看出EM算法的用途，最大期望算法，“期望”二字表明算法主要针对概率问题，“最大”说明这是在求解优化问题。<a id="more"></a></p>
+<p>我们从哪儿说起呢，既然提到概率问题，那我们就从概率问题中参数估计最常见的方法最大似然估计说起吧。最大似然估计基于一个假设，观察到的数据出现概率最大，这个假设其实很符合我们的直观认识，因为你都观察到这组数据了那么它们的出现概率自然也不小，使其最大也挺合理的。其实，有人说过统计学就是猜上帝的游戏，那我们现在开始和上帝来玩一个游戏：上帝手上一枚硬币，但这么硬币不是均匀的。现在上帝抛掷这么硬币，然后告诉你其中有10次正面向上，有90次反面向上，问你上帝再抛掷一次是正面向上还是反面向上。我们学过最大似然估计，所以我们打算用这种方法来进行估计，首先建立概率模型：$f(k;n,p)=Pr(k=k)=\dbinom{n}{k}p^k(1-p)^{n-k}$，然后进行参数估计：$L(\theta)=L(x_1,…,X_n;\theta)=\prod_{i=1}^np(x_i;\theta),{\theta}{\in}{\Theta}$，$\hat{\theta}=argmax_{\theta}L(\theta)$。针对我们和上帝玩的游戏：$\hat{\theta}=argmax_{\theta}\dbinom{100}{10}{\theta}^{10}(1-\theta)^{90}$。<br>好了，现在上帝发现我们还挺聪明，决定提升游戏难度，Game V2.0：上帝有一台神奇的机器，这台机器类似于我们玩的老虎机，每摇一下手柄，机器就会产生一个1到6的随机数字（概率不相同）。这台机器神奇的地方在于它不仅会产生一个数字还会产生噪声（Noise），而且噪声的分贝是服从高斯分布的，产生的数字不同高斯分布也不同。现在上帝用开始玩游戏，你有仪器记录下每次噪声的分贝，你获得了100次的数据。然后上帝再玩一次，你依旧得到噪声的分贝，这时上帝问你机器产生的数字是多少？我们一想，这其实也不是什么很难的问题啊，继续使用最大似然估计。构建概率模型：$p(x^{(i)};\phi,\mu,\Sigma)=\sum_{z^{(i)=1}}^k{\quad}p(x^{(i)}{\mid}z^{(i)};\mu,\Sigma)p(z^{(i)};\phi)$，由于$p(x^{(i)};\phi,\mu,\Sigma)$的概率有隐含变量$z^{(i)}$和一个依赖$z^{(i)}$的高斯分布决定，所以这个也叫混合高斯模型。概率模型构建好了，我们进行参数估计：$\ell(\phi,\mu,\Sigma)=\sum_{i=1}^mlogp(x^{(i)};\phi,\mu,\Sigma)=\sum_{i=1}^mlog\sum_{z^{(i)=1}}^k{\quad}p(x^{(i)}{\mid}z^{(i)};\mu,\Sigma)p(z^{(i)};\phi)$。我们一看这个对数似然函数没有办法直接用求导然后令倒数等于零来求解参数啊。那怎么办，没事儿，我们还有一招——EM算法。</p>
+<p>下面我们就来看一看如何使用EM算法对混合高斯模型进行参数估计。为了便于书写，我们把所有参数都表示成$\theta$。那么我们的优化目标是：$$\hat{\theta}=argmax\ell(\theta)=argmax\sum_{i=1}^mlogp(x^{(i)};\theta)\\<br>=argmax\sum_{i=1}^mlog\sum_{z}p(x^{(i)},z^{(i)};\theta)$$<br>对于这样一个函数，我们可不可以考虑找到它的一个下界函数，然后求解它的下界函数的最大值来不断逼近原函数的最大值，这其实就是EM算法的思想，要找函数的下界需要用到另外一个工具—— Jensen不等式(对于凹函数，有$E[f(x)]{\le}f(E[x])$)。利用Jensen不等式对原函数进行放缩：$$\sum_{i=1}^mlogp(x^{(i)};\theta)=\sum_{i=1}^mlog\sum_{z^{(i)}}{\quad}p(x^{(i)},z^{(i)};\theta)\\<br>=\sum_{i=1}^mlog\sum_{z^{(i)}}{\quad}Q_i(z^{(i)})\frac{p(x^{(i)},z^{(i)};\theta)}{Q_i(z^{(i)})}\\<br>\ge\sum_{i=1}^m\sum_{z^{(i)}}{\quad}Q_i(z^{(i)})log\frac{p(x^{(i)},z^{(i)};\theta)}{Q_i(z^{(i)})}$$<br>这里要求$Q_i(z^{(i)})$是一个概率分布，这样$\sum_{z^{(i)}}{\quad}Q_i(z^{(i)})\frac{p(x^{(i)},z^{(i)};\theta)}{Q_i(z^{(i)})}$就是函数$\frac{p(x^{(i)},z^{(i)};\theta)}{Q_i(z^{(i)})}$的期望。那么现在问题来了，$Q_i(z^{(i)})$的选择有很多，到底应该选择怎么样概率分布啦。假设𝜃已经给定，那么$\ell(\theta)$的值就决定于$𝑄_𝑖(𝑧^{(𝑖)})$和$p(𝑥^{(𝑖)},𝑧^{(𝑖)})$了。我们可以通过调整这两个概率使下界不断上升，以逼近$\ell(\theta)$的真实值，那么什么时候算是调整好了呢？当不等式变成等式时，说明我们调整后的概率能够等价于$\ell(\theta)$了，如下图所示<br><img class="alignnone size-full wp-image-301" src="http://glacier.iego.net/wp-content/uploads/2015/04/EM.png" alt="EM" width="527"><br>按照这个思路，我们要找到等式成立的条件。根据Jensen不等式，要想让等式成立，需要让随机变量变成常数值，这里得到：$\frac{p(x^{(i)},z^{(i)};\theta)}{Q_i(z^{(i)})}=c$,<br>推导一下，可得，<br>$$Q_i(z^{(i)})=\frac{p(x^{(i)},z^{(i)};\theta)}{\sum_zp(x^{(i)},z^{(i)};\theta)}\\<br>=\frac{p(x^{(i)},z^{(i)};\theta)}{p(x^{(i)};\theta)}\\<br>=p(z^{(i)}{\mid}x^{(i)};\theta)$$<br>综上所述，<strong>E步骤</strong>：$Q_i(z^{(i)})=p(z^{(i)}{\mid}x^{(i)};{\theta}^t)$,<br><strong>M步骤</strong>：${\theta}^{t+1}=argmax_{\theta}\sum_i\sum_zQ_i(z^{(i)})log\frac{p(x^{(i)},z^{(i)};\theta)}{Q_i(z^{(i)})}$</p>
+<p>回到我们之前的和上帝的游戏中，具体优化算法为：<br><img class="alignnone size-full wp-image-281" src="http://glacier.iego.net/wp-content/uploads/2015/04/EM_1.png" alt="EM_1" width="540" height="403"></p>
+<p>为了更加直观的演示EM算法的优化过程，我们可以写一个程序来模型混合高斯模型产生数据的过程，再用EM算法对产生的数据做最大似然估计，<strong>github传送门：<a href="https://github.com/hit-computer/Algorithm/tree/master/EM%20Algorithm" target="_blank">EM Algorithm</a></strong><br>下面看一下随着迭代次数的增加，对数似然值得变化情况吧，<br><img class="alignnone size-full wp-image-282" src="http://glacier.iego.net/wp-content/uploads/2015/04/EM_2.png" alt="EM_2" width="500"><br>我们可以放大1800到2300次迭代之间的对数似然值变化情况，发现2000次知乎对数似然值几乎就不怎么变化了，说明已达到最大值，<br><img class="alignnone size-full wp-image-284" src="http://glacier.iego.net/wp-content/uploads/2015/04/EM_3-1.png" alt="EM_3" width="500"></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"># 机器学习</a>
+          
+            <a href="/tags/概率论/" rel="tag"># 概率论</a>
+          
+            <a href="/tags/EM/" rel="tag"># EM</a>
+          
+            <a href="/tags/期望/" rel="tag"># 期望</a>
+          
+            <a href="/tags/混合高斯模型/" rel="tag"># 混合高斯模型</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/12/CNN-VGG19/" rel="next" title="卷积神经网络初窥——VGG19学习笔记">
+                <i class="fa fa-chevron-left"></i> 卷积神经网络初窥——VGG19学习笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpg"
+               alt="Glacier" />
+          <p class="site-author-name" itemprop="name">Glacier</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Glacier</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.1"></script>
+
+
+
+  
+
+
+  
+
+    
+      <script id="dsq-count-scr" src="https://hit-computer-github-io.disqus.com/count.js" async></script>
+    
+
+    
+      <script type="text/javascript">
+        var disqus_config = function () {
+          this.page.url = 'http://yoursite.com/2017/06/12/EM-Algorithm/';
+          this.page.identifier = '2017/06/12/EM-Algorithm/';
+          this.page.title = 'EM算法浅析';
+        };
+        var d = document, s = d.createElement('script');
+        s.src = 'https://hit-computer-github-io.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      </script>
+    
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>
